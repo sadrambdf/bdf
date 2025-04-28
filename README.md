@@ -1,7 +1,5 @@
-Untuk melihat materi di atas, silahkan ketik di bagian url :
-https://sadrambdf.github.io/bdf/nama_file_materi_yang_akan_fitampilkan_tulis_berserta_ekstensinya?authuser=0
-----------------
-misalnya :
+Untuk melihat materi di atas, silahkan klik tautan berikut :
+------------------------------------------------------------
+
+VIDEOGRAFI :
 https://sadrambdf.github.io/bdf/videografi.html
-atau
-https://sadrambdf.github.io/bdf/videografi.html?authuser=0
