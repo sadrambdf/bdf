@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logbook Digital & Timeline: Company Profile - SMKN 1 Tasikmalaya</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        @media print {
+            body { background: white !important; color: black !important; }
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            /* Memaksa seluruh tahap/tab konten tampil berurutan saat dicetak ke PDF */
+            .tahap-content { display: block !important; opacity: 1 !important; visibility: visible !important; margin-bottom: 25px !important; page-break-inside: avoid; }
+            .print-card { border: 1px solid #cbd5e1 !important; background: white !important; color: black !important; box-shadow: none !important; margin-bottom: 15px !important; }
+            table { width: 100% !important; border-collapse: collapse !important; }
+            th, td { border: 1px solid #94a3b8 !important; padding: 6px 8px !important; color: black !important; font-size: 9pt !important; }
+            th { background-color: #f1f5f9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            input, select, textarea { border: none !important; background: transparent !important; color: black !important; padding: 0 !important; font-weight: 600; }
+        }
+        .print-only { display: none; }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+
+    <div id="toast" class="fixed top-5 right-5 z-50 transform translate-x-full transition-all duration-300 bg-emerald-600 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-3 text-sm font-semibold">
+        <span>✨</span>
+        <span id="toast-msg">Berhasil disimpan!</span>
+    </div>
+
+    <div class="max-w-6xl w-full mx-auto p-3 sm:p-6 flex-grow">
+        
+        <!-- HEADER / KOP PROYEK & IDENTITAS SISWA -->
+        <header class="bg-slate-800 border border-slate-700 rounded-2xl p-4 sm:p-8 mb-6 shadow-xl relative overflow-hidden">
+            <div class="absolute -right-10 -bottom-10 opacity-10 text-9xl">🎬</div>
+            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
+                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left w-full sm:w-auto">
+                    <!-- Logo Jurusan Interaktif di Kiri -->
+                    <label for="input-logo-jurusan" class="cursor-pointer group relative flex-shrink-0" title="Klik untuk ganti logo jurusan">
+                        <div id="wrapper-logo" class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl border-2 border-dashed border-indigo-400 flex items-center justify-center bg-indigo-950/60 overflow-hidden shadow-inner group-hover:border-indigo-300 transition mx-auto">
+                            <img id="img-logo" src="" class="w-full h-full object-cover hidden" alt="Logo">
+                            <span id="text-logo-placeholder" class="text-[10px] text-indigo-300 text-center font-bold px-1">Logo Jurusan</span>
+                        </div>
+                    </label>
+                    <input type="file" id="input-logo-jurusan" accept="image/*" class="hidden" onchange="gantiLogo(event)">
+
+                    <div>
+                        <div class="inline-flex items-center gap-2 bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 px-3 py-1 rounded-full text-xs font-bold mb-2 uppercase tracking-wider">
+                            <i class="fas fa-id-badge"></i> Proyek Mandiri / Kelompok Perfilman
+                        </div>
+                        <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-white uppercase">LOGBOOK DIGITAL: COMPANY PROFILE</h1>
+                        <p class="text-xs sm:text-sm text-slate-400 mt-0.5">SMKN 1 TASIKMALAYA | Kompetensi Keahlian Broadcasting dan Perfilman</p>
+                    </div>
+                </div>
+                
+                <div class="bg-slate-900/80 border border-slate-700 px-4 py-3 rounded-xl text-left md:text-right w-full md:w-auto flex-shrink-0">
+                    <span class="text-xs text-slate-400 block">Status Pengerjaan Proyek:</span>
+                    <span id="label-progres-total" class="text-base sm:text-lg font-black text-amber-400">0% (Tahap Perencanaan)</span>
+                </div>
+            </div>
+
+            <!-- FORM IDENTITAS SISWA & KELAS -->
+            <div class="mt-6 pt-5 border-t border-slate-700/80 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1"><i class="fas fa-user mr-1 text-indigo-400"></i> Nama Lengkap Siswa / Ketua Kelompok:</label>
+                    <input type="text" id="input-nama-siswa" placeholder="Contoh: Muhammad Rizki Ramdani" onchange="simpanIdentitas()" class="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1"><i class="fas fa-graduation-cap mr-1 text-indigo-400"></i> Kelas:</label>
+                    <select id="select-kelas-siswa" onchange="simpanIdentitas()" class="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500">
+                        <option value="">-- Pilih Kelas --</option>
+                        <option value="X-BDF 1 (Broadcasting dan Film)">X-BDF 1 (Broadcasting dan Film)</option>
+                        <option value="X-BDF 2 (Broadcasting dan Film)">X-BDF 2 (Broadcasting dan Film)</option>
+                        <option value="XI-PF 1 (Produksi Film)">XI-PF 1 (Produksi Film)</option>
+                        <option value="XI-PF 2 (Produksi Film)">XI-PF 2 (Produksi Film)</option>
+                        <option value="XII-PF 1 (Produksi Film)">XII-PF 1 (Produksi Film)</option>
+                        <option value="XII-PF 2 (Produksi Film)">XII-PF 2 (Produksi Film)</option>
+                    </select>
+                </div>
+            </div>
+        </header>
+
+        <nav class="no-print grid grid-cols-2 sm:grid-cols-5 gap-2.5 mb-6">
+            <button onclick="pilihTahap('juknis')" id="btn-tab-juknis" class="p-3 rounded-xl border border-slate-700 bg-slate-800 text-slate-400 hover:border-slate-600 transition flex items-center space-x-2 text-left">
+                <div class="w-8 h-8 rounded-lg bg-slate-700 flex items-center justify-center text-sm flex-shrink-0">📖</div>
+                <div>
+                    <div class="text-[10px] uppercase tracking-wider text-slate-500">Panduan</div>
+                    <div class="text-xs sm:text-sm text-white font-bold truncate">Juknis</div>
+                </div>
+            </button>
+            <button onclick="pilihTahap('timeline')" id="btn-tab-timeline" class="p-3 rounded-xl border border-slate-700 bg-slate-800 text-slate-400 hover:border-slate-600 transition flex items-center space-x-2 text-left">
+                <div class="w-8 h-8 rounded-lg bg-slate-700 flex items-center justify-center text-sm flex-shrink-0">📅</div>
+                <div>
+                    <div class="text-[10px] uppercase tracking-wider text-slate-500">Jadwal</div>
+                    <div class="text-xs sm:text-sm text-white font-bold truncate">Timeline</div>
+                </div>
+            </button>
+            <button onclick="pilihTahap('pra')" id="btn-tab-pra" class="p-3 rounded-xl border border-indigo-500 bg-indigo-600/20 text-indigo-300 font-bold transition flex items-center space-x-2 text-left">
+                <div class="w-8 h-8 rounded-lg bg-indigo-500/30 flex items-center justify-center text-sm flex-shrink-0">📝</div>
+                <div>
+                    <div class="text-[10px] uppercase tracking-wider text-indigo-400">Tahap 1</div>
+                    <div class="text-xs sm:text-sm text-white font-bold truncate">Pra-Produksi</div>
+                </div>
+            </button>
+            <button onclick="pilihTahap('produksi')" id="btn-tab-produksi" class="p-3 rounded-xl border border-slate-700 bg-slate-800 text-slate-400 hover:border-slate-600 transition flex items-center space-x-2 text-left">
+                <div class="w-8 h-8 rounded-lg bg-slate-700 flex items-center justify-center text-sm flex-shrink-0">🎥</div>
+                <div>
+                    <div class="text-[10px] uppercase tracking-wider text-slate-500">Tahap 2</div>
+                    <div class="text-xs sm:text-sm text-white font-bold truncate">Produksi</div>
+                </div>
+            </button>
+            <button onclick="pilihTahap('pasca')" id="btn-tab-pasca" class="p-3 rounded-xl border border-slate-700 bg-slate-800 text-slate-400 hover:border-slate-600 transition flex items-center space-x-2 text-left col-span-2 sm:col-span-1">
+                <div class="w-8 h-8 rounded-lg bg-slate-700 flex items-center justify-center text-sm flex-shrink-0">✂️</div>
+                <div>
+                    <div class="text-[10px] uppercase tracking-wider text-slate-500">Tahap 3</div>
+                    <div class="text-xs sm:text-sm text-white font-bold truncate">Pasca-Produksi</div>
+                </div>
+            </button>
+        </nav>
+
+        <!-- KONTEN TAB 0: JUKNIS & GLOSARIUM LENGKAP -->
+        <div id="tahap-juknis" class="tahap-content space-y-6 hidden">
+            <div class="bg-slate-800 border border-slate-700 rounded-2xl p-4 sm:p-6 shadow-lg space-y-5 print-card">
+                <div class="border-b border-slate-700 pb-3">
+                    <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+                        <span>📖</span> Petunjuk Teknis (Juknis) & Glosarium Perfilman Lengkap
+                    </h2>
+                    <p class="text-xs text-slate-400">Panduan komprehensif bagi siswa Broadcasting dan Perfilman SMKN 1 Tasikmalaya dalam menggarap proyek Company Profile berstandar industri.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm text-slate-300">
+                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-2">
+                        <h3 class="font-bold text-indigo-400 text-sm uppercase">🎯 Ketentuan & Tujuan Proyek</h3>
+                        <p>Membuat video profil perusahaan (Company Profile) durasi 2-5 menit yang memuat sejarah singkat, visi-misi, produk/jasa unggulan (USP), serta testimoni klien dengan alur penulisan dan teknis sinematografi profesional.</p>
+                    </div>
+                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-2">
+                        <h3 class="font-bold text-indigo-400 text-sm uppercase">📋 Cara Penggunaan Aplikasi</h3>
+                        <ol class="list-decimal list-inside space-y-1">
+                            <li>Isi identitas nama lengkap dan kelas di bagian atas.</li>
+                            <li>Susun target waktu di menu <strong>Timeline</strong> (Pra-Produksi, Produksi, Pasca-Produksi).</li>
+                            <li>Centang checklist dokumen dan checklist alat secara berkala.</li>
+                            <li>Catat aktivitas harian di menu <strong>Produksi & Log Harian</strong>.</li>
+                            <li>Cetak laporan akhir dalam format PDF menggunakan tombol di bawah.</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-3">
+                    <h3 class="font-bold text-indigo-400 text-sm uppercase">💡 Kamus Istilah Perfilman & Penjelasan Fitur</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                        <div class="bg-slate-800 p-3 rounded-lg border border-slate-700 space-y-1">
+                            <strong class="text-white block">1. Pre-Production (Pra-Produksi)</strong>
+                            <span class="text-slate-400">Tahap riset perusahaan, penulisan script, pembuatan storyboard shot-by-shot, budgeting, dan pencarian izin lokasi (MoU).</span>
+                        </div>
+                        <div class="bg-slate-800 p-3 rounded-lg border border-slate-700 space-y-1">
+                            <strong class="text-white block">2. Principal Photography (Produksi)</strong>
+                            <span class="text-slate-400">Eksekusi pengambilan gambar (shooting) di lapangan menggunakan kamera, lighting, dan perekam audio sesuai call sheet.</span>
+                        </div>
+                        <div class="bg-slate-800 p-3 rounded-lg border border-slate-700 space-y-1">
+                            <strong class="text-white block">3. Post-Production (Pasca-Produksi)</strong>
+                            <span class="text-slate-400">Editing video (rough cut & fine cut), color grading, sound design (BGM & SFX), hingga ekspor master video final.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- KONTEN TAB 1: TIMELINE / RENCANA JADWAL TAHAPAN -->
+        <div id="tahap-timeline" class="tahap-content space-y-6 hidden">
+            <div class="bg-slate-800 border border-slate-700 rounded-2xl p-4 sm:p-6 shadow-lg print-card">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-4 pb-3 border-b border-slate-700 gap-3">
+                    <div>
+                        <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+                            <span>📅</span> Rencana Jadwal & Target Pengerjaan (Timeline)
+                        </h2>
+                        <p class="text-xs text-slate-400">Pilih rentang tanggal dan tahapan untuk memantau durasi pengerjaan proyek.</p>
+                    </div>
+                    <button onclick="bukaModalTimeline()" class="no-print bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-md w-full sm:w-auto">
+                        <i class="fas fa-plus"></i> Tambah Target Jadwal
+                    </button>
+                </div>
+
+                <!-- Form Modal Tambah Timeline -->
+                <div id="modal-tambah-timeline" class="hidden bg-slate-900 border border-indigo-500/50 p-4 rounded-xl mb-5 space-y-3">
+                    <h3 class="text-xs font-bold text-indigo-400 uppercase">Form Tambah Target Jadwal Produksi</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-300 mb-1">Tahapan:</label>
+                            <select id="input-timeline-tahap" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-xs text-white">
+                                <option value="Pra-Produksi">Pra-Produksi</option>
+                                <option value="Produksi">Produksi</option>
+                                <option value="Pasca-Produksi">Pasca-Produksi</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-300 mb-1">Rincian Kegiatan / Tugas:</label>
+                            <input type="text" id="input-timeline-tugas" placeholder="Contoh: Wawancara Direktur & B-Roll" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-xs text-white">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-[11px] font-semibold text-slate-300 mb-1">Tanggal Mulai:</label>
+                                <input type="date" id="input-timeline-mulai" class="w-full px-2 py-2 bg-slate-800 border border-slate-700 rounded-lg text-xs text-white">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-semibold text-slate-300 mb-1">Tanggal Selesai:</label>
+                                <input type="date" id="input-timeline-selesai" class="w-full px-2 py-2 bg-slate-800 border border-slate-700 rounded-lg text-xs text-white">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex justify-end gap-2 pt-2">
+                        <button onclick="tutupModalTimeline()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-semibold">Batal</button>
+                        <button onclick="simpanTimelineBaru()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-1.5 rounded-lg text-xs font-bold">Simpan Target</button>
+                    </div>
+                </div>
+
+                <!-- Tabel Timeline -->
+                <div class="border border-slate-700 rounded-xl overflow-hidden bg-slate-900 overflow-x-auto">
+                    <table class="w-full text-left text-xs sm:text-sm min-w-[500px]">
+                        <thead class="bg-slate-800 text-slate-300 uppercase text-[10px] sm:text-xs">
+                            <tr>
+                                <th class="p-3">Tahapan</th>
+                                <th class="p-3">Rincian Kegiatan / Tugas</th>
+                                <th class="p-3">Rentang Tanggal</th>
+                                <th class="p-3">Durasi</th>
+                                <th class="no-print p-3 text-center w-16">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabel-timeline-body" class="divide-y divide-slate-800 text-slate-300">
+                            <tr><td colspan="5" class="p-4 text-center text-slate-500 italic">Belum ada target jadwal.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- KONTEN TAHAP 2: PRA-PRODUKSI -->
+        <div id="tahap-pra" class="tahap-content space-y-6">
+            <div class="bg-slate-800 border border-slate-700 rounded-2xl p-4 sm:p-6 shadow-lg print-card">
+                <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-700">
+                    <div>
+                        <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+                            <span>📝</span> Checklist & Dokumen Pra-Produksi
+                        </h2>
+                        <p class="text-xs text-slate-400">Pastikan seluruh dokumen penulisan dan perencanaan video Company Profile lengkap.</p>
+                    </div>
+                    <button onclick="resetData('pra')" class="no-print text-xs bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded-lg text-slate-300 transition">Reset</button>
+                </div>
+
+                <div class="space-y-3" id="checklist-pra-container"></div>
+
+                <div class="mt-6 pt-5 border-t border-slate-700 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Nama Perusahaan Klien:</label>
+                        <input type="text" id="input-nama-klien" placeholder="Contoh: PT. Batik Citra Nusantara" onchange="simpanDataLokal()" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Link Dokumen (Naskah/Storyboard/Proposal):</label>
+                        <input type="url" id="input-link-pra" placeholder="https://docs.google.com/..." onchange="simpanDataLokal()" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- KONTEN TAHAP 3: PRODUKSI -->
+        <div id="tahap-produksi" class="tahap-content space-y-6 hidden">
+            <div class="bg-slate-800 border border-slate-700 rounded-2xl p-4 sm:p-6 shadow-lg print-card">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-4 pb-3 border-b border-slate-700 gap-3">
+                    <div>
+                        <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+                            <span>🎥</span> Jurnal Harian & Log Syuting
+                        </h2>
+                        <p class="text-xs text-slate-400">Catat setiap kegiatan harian dan progress pengambilan gambar di lapangan.</p>
+                    </div>
+                    <button onclick="bukaModalLog()" class="no-print bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-md w-full sm:w-auto">
+                        <i class="fas fa-plus"></i> Tambah Log Kegiatan Harian
+                    </button>
+                </div>
+
+                <!-- Form Modal Tambah Log Harian -->
+                <div id="modal-tambah-log" class="hidden bg-slate-900 border border-indigo-500/50 p-4 rounded-xl mb-5 space-y-3">
+                    <h3 class="text-xs font-bold text-indigo-400 uppercase">Form Tambah Log Kegiatan Syuting Harian</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-300 mb-1">Tanggal Kegiatan:</label>
+                            <input type="date" id="input-log-tanggal" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-xs text-white">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-300 mb-1">Aktivitas / Lokasi:</label>
+                            <input type="text" id="input-log-lokasi" placeholder="Cth: Wawancara Klien / Pabrik Utama" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-xs text-white">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-300 mb-1">Deskripsi / Hasil Pengerjaan:</label>
+                            <input type="text" id="input-log-adegan" placeholder="Cth: Pengambilan B-Roll proses produksi batik" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-xs text-white">
+                        </div>
+                    </div>
+                    <div class="flex justify-end gap-2 pt-2">
+                        <button onclick="tutupModalLog()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-semibold">Batal</button>
+                        <button onclick="simpanLogBaru()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-1.5 rounded-lg text-xs font-bold">Simpan Log</button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-700">
+                        <h3 class="text-xs font-bold uppercase text-indigo-400 mb-2">Checklist Alat Utama</h3>
+                        <div class="space-y-2 text-sm" id="checklist-alat-container"></div>
+                    </div>
+                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-xs font-bold uppercase text-indigo-400 mb-2">Catatan Sutradara / DOP</h3>
+                            <textarea id="input-catatan-sutradara" placeholder="Tulis kendala cuaca, pergantian angle, atau evaluasi harian..." onchange="simpanCatatanSutradara()" class="w-full h-24 p-2.5 bg-slate-800 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-indigo-500 resize-none"></textarea>
+                        </div>
+                        <button onclick="simpanCatatanSutradara()" class="no-print mt-2 bg-slate-700 hover:bg-slate-600 text-white py-1.5 rounded-lg text-xs font-semibold transition">Simpan Catatan</button>
+                    </div>
+                </div>
+
+                <!-- Tabel Log Kegiatan / Syuting -->
+                <div class="border border-slate-700 rounded-xl overflow-hidden bg-slate-900 overflow-x-auto">
+                    <table class="w-full text-left text-xs sm:text-sm min-w-[500px]">
+                        <thead class="bg-slate-800 text-slate-300 uppercase text-[10px] sm:text-xs">
+                            <tr>
+                                <th class="p-3">Hari/Tanggal</th>
+                                <th class="p-3">Kegiatan / Lokasi</th>
+                                <th class="p-3">Deskripsi / Hasil</th>
+                                <th class="p-3 text-center">Status</th>
+                                <th class="no-print p-3 text-center w-16">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabel-log-produksi" class="divide-y divide-slate-800 text-slate-300">
+                            <tr><td colspan="5" class="p-4 text-center text-slate-500 italic">Belum ada log kegiatan ditambahkan.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- KONTEN TAHAP 4: PASCA PRODUKSI -->
+        <div id="tahap-pasca" class="tahap-content space-y-6 hidden">
+            <div class="bg-slate-800 border border-slate-700 rounded-2xl p-4 sm:p-6 shadow-lg print-card">
+                <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-700">
+                    <div>
+                        <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+                            <span>✂️</span> Editing, Review, & Publikasi
+                        </h2>
+                        <p class="text-xs text-slate-400">Pantau proses rough cut, fine cut, color grading, hingga video final.</p>
+                    </div>
+                </div>
+
+                <div class="space-y-4" id="checklist-pasca-container"></div>
+
+                <div class="mt-6 pt-5 border-t border-slate-700 bg-slate-900 p-4 rounded-xl border border-slate-700">
+                    <label class="block text-xs font-semibold text-indigo-400 mb-1">Link Hasil Video Akhir (Google Drive / YouTube Unlisted / Frame.io):</label>
+                    <div class="flex flex-col sm:flex-row gap-2">
+                        <input type="url" id="input-link-final" placeholder="https://youtube.com/watch?v=..." onchange="simpanLinkFinal()" class="flex-1 px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500">
+                        <button onclick="simpanLinkFinal()" class="no-print bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-xs font-bold transition">Simpan Link</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TOMBOL AKSI EKSPOR LAPORAN (CETAK PDF) -->
+        <div class="no-print mt-6 bg-slate-800 border border-slate-700 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="text-xs text-slate-400 text-center sm:text-left">
+                💡 <span class="text-white font-semibold">Tips:</span> Klik tombol cetak untuk menyimpan laporan lengkap dalam format PDF atau cetak lembar kerja siswa.
+            </div>
+            <button onclick="window.print()" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold shadow-lg transition flex items-center justify-center space-x-2">
+                <span>🖨️</span>
+                <span>Cetak / Simpan Laporan PDF</span>
+            </button>
+        </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="mt-auto py-4 text-center text-xs text-slate-500 border-t border-slate-800 bg-slate-900">
+        Copy Right 2026 | design by : sadrammedia.
+    </footer>
+
+    <script>
+        let proyekData = {
+            namaSiswa: "",
+            kelasSiswa: "",
+            namaKlien: "",
+            linkPra: "",
+            catatanSutradara: "",
+            linkFinal: "",
+            logoJurusan: "",
+            timeline: [
+                { tahapan: "Pra-Produksi", tugas: "Riset Klien & Penyusunan Proposal", mulai: "2026-08-01", selesai: "2026-08-03", durasi: "3 Hari" },
+                { tahapan: "Pra-Produksi", tugas: "Penulisan Naskah & Storyboard", mulai: "2026-08-04", selesai: "2026-08-07", durasi: "4 Hari" },
+                { tahapan: "Produksi", tugas: "Shooting / Principal Photography", mulai: "2026-08-10", selesai: "2026-08-12", durasi: "3 Hari" },
+                { tahapan: "Pasca-Produksi", tugas: "Editing, Color Grading, & Sound Design", mulai: "2026-08-13", selesai: "2026-08-17", durasi: "5 Hari" }
+            ],
+            praChecklist: [
+                { id: 1, teks: "Surat Izin / Kerjasama Klien (MoU / Permohonan Izin Liputan)", selesai: false },
+                { id: 2, teks: "Riset Profil Perusahaan, Visi Misi, & Unique Selling Proposition (USP)", selesai: false },
+                { id: 3, teks: "Penyusunan Konsep Visual & Moodboard", selesai: false },
+                { id: 4, teks: "Penulisan Naskah (Script) & Storyboard Shot by Shot", selesai: false },
+                { id: 5, teks: "Breakdown Budgeting & Jadwal Kerja (Production Schedule)", selesai: false }
+            ],
+            alatChecklist: [
+                { id: 1, alat: "Kamera Mirrorless / DSLR (Min. 2 Unit + Baterai Cadangan)", selesai: false },
+                { id: 2, alat: "Audio: Wireless Mic / Lavalier & Shotgun Mic", selesai: false },
+                { id: 3, alat: "Pencahayaan: Softbox / LED Panel / Portable Light", selesai: false },
+                { id: 4, alat: "Stabilizer / Gimbal & Tripod", selesai: false }
+            ],
+            logProduksi: [
+                { tanggal: "2026-08-10", lokasi: "Studio/Outdoor", adegan: "Wawancara Direktur Utama", status: "Selesai" },
+                { tanggal: "2026-08-11", lokasi: "Pabrik Utama", adegan: "Pengambilan B-Roll Proses Produksi", status: "Selesai" }
+            ],
+            pascaChecklist: [
+                { id: 1, teks: "Ingesting & Backup Data Footage Mentah (File Organization)", selesai: false },
+                { id: 2, teks: "Penyusunan Rough Cut (Menyambungkan adegan sesuai naskah)", selesai: false },
+                { id: 3, teks: "Fine Cut & Sound Design (Pemberian BGM, Sound Effect, & Mixing Audio)", selesai: false },
+                { id: 4, teks: "Color Grading & Motion Graphics / Lower Third Title", selesai: false },
+                { id: 5, teks: "Review Klien & Revisi Final", selesai: false },
+                { id: 6, teks: "Ekspor Video Master Resolusi Full HD / 4K", selesai: false }
+            ]
+        };
+
+        window.onload = function() {
+            muatDataLokal();
+            renderSemua();
+        };
+
+        function showToast(pesan) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = pesan;
+            toast.classList.remove('translate-x-full');
+            setTimeout(() => { toast.classList.add('translate-x-full'); }, 3000);
+        }
+
+        function pilihTahap(tahap) {
+            ['juknis', 'timeline', 'pra', 'produksi', 'pasca'].forEach(t => {
+                const el = document.getElementById(`tahap-${t}`);
+                const btn = document.getElementById(`btn-tab-${t}`);
+                if(el) el.classList.add('hidden');
+                if(btn) btn.className = "p-3 rounded-xl border border-slate-700 bg-slate-800 text-slate-400 hover:border-slate-600 transition flex items-center space-x-2 text-left " + (t==='pasca'?'col-span-2 sm:col-span-1':'');
+            });
+            const activeEl = document.getElementById(`tahap-${tahap}`);
+            const activeBtn = document.getElementById(`btn-tab-${tahap}`);
+            if(activeEl) activeEl.classList.remove('hidden');
+            if(activeBtn) activeBtn.className = "p-3 rounded-xl border border-indigo-500 bg-indigo-600/20 text-indigo-300 font-bold transition flex items-center space-x-2 text-left " + (tahap==='pasca'?'col-span-2 sm:col-span-1':'');
+        }
+
+        function gantiLogo(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    proyekData.logoJurusan = e.target.result;
+                    simpanDataLokal();
+                    renderLogo();
+                    showToast("Logo jurusan berhasil diperbarui!");
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function renderLogo() {
+            const img = document.getElementById('img-logo');
+            const placeholder = document.getElementById('text-logo-placeholder');
+            const wrapper = document.getElementById('wrapper-logo');
+            if (proyekData.logoJurusan) {
+                img.src = proyekData.logoJurusan;
+                img.classList.remove('hidden');
+                placeholder.classList.add('hidden');
+                wrapper.classList.remove('border-dashed');
+            }
+        }
+
+        function renderSemua() {
+            renderLogo();
+
+            document.getElementById('input-nama-siswa').value = proyekData.namaSiswa || '';
+            document.getElementById('select-kelas-siswa').value = proyekData.kelasSiswa || '';
+
+            // Render Timeline
+            const timelineBody = document.getElementById('tabel-timeline-body');
+            if (proyekData.timeline.length === 0) {
+                timelineBody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500 italic">Belum ada target jadwal.</td></tr>`;
+            } else {
+                let timelineHtml = '';
+                proyekData.timeline.forEach((item, idx) => {
+                    let tglFormat = `${item.mulai} s.d ${item.selesai}`;
+                    timelineHtml += `
+                        <tr class="hover:bg-slate-800/50">
+                            <td class="p-3 font-bold text-indigo-400">${item.tahapan}</td>
+                            <td class="p-3">${item.tugas}</td>
+                            <td class="p-3">${tglFormat}</td>
+                            <td class="p-3"><span class="bg-slate-800 text-slate-300 px-2.5 py-1 rounded-md text-xs border border-slate-700">${item.durasi}</span></td>
+                            <td class="no-print p-3 text-center">
+                                <button onclick="hapusTimeline(${idx})" class="text-rose-400 hover:text-rose-300"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                timelineBody.innerHTML = timelineHtml;
+            }
+
+            // Render Pra
+            const praContainer = document.getElementById('checklist-pra-container');
+            let praHtml = '';
+            proyekData.praChecklist.forEach(item => {
+                praHtml += `
+                    <label class="flex items-center space-x-3 p-3 rounded-xl bg-slate-900 border border-slate-700 hover:border-slate-600 cursor-pointer transition">
+                        <input type="checkbox" ${item.selesai ? 'checked' : ''} onchange="togglePra(${item.id})" class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 bg-slate-800 border-slate-700">
+                        <span class="text-sm ${item.selesai ? 'line-through text-slate-500' : 'text-slate-200'}">${item.teks}</span>
+                    </label>
+                `;
+            });
+            praContainer.innerHTML = praHtml;
+            document.getElementById('input-nama-klien').value = proyekData.namaKlien || '';
+            document.getElementById('input-link-pra').value = proyekData.linkPra || '';
+
+            // Render Alat
+            const alatContainer = document.getElementById('checklist-alat-container');
+            let alatHtml = '';
+            proyekData.alatChecklist.forEach(item => {
+                alatHtml += `
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" ${item.selesai ? 'checked' : ''} onchange="toggleAlat(${item.id})" class="w-3.5 h-3.5 rounded text-indigo-600 bg-slate-800 border-slate-700">
+                        <span class="${item.selesai ? 'line-through text-slate-500' : 'text-slate-300'}">${item.alat}</span>
+                    </label>
+                `;
+            });
+            alatContainer.innerHTML = alatHtml;
+            document.getElementById('input-catatan-sutradara').value = proyekData.catatanSutradara || '';
+
+            // Render Log Produksi Table
+            const tbodyLog = document.getElementById('tabel-log-produksi');
+            if (proyekData.logProduksi.length === 0) {
+                tbodyLog.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500 italic">Belum ada log kegiatan ditambahkan.</td></tr>`;
+            } else {
+                let logHtml = '';
+                proyekData.logProduksi.forEach((log, idx) => {
+                    logHtml += `
+                        <tr class="hover:bg-slate-800/50">
+                            <td class="p-3 font-semibold">${log.tanggal}</td>
+                            <td class="p-3">${log.lokasi}</td>
+                            <td class="p-3">${log.adegan}</td>
+                            <td class="p-3 text-center"><span class="bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded text-xs font-bold">${log.status}</span></td>
+                            <td class="no-print p-3 text-center">
+                                <button onclick="hapusLog(${idx})" class="text-rose-400 hover:text-rose-300"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                tbodyLog.innerHTML = logHtml;
+            }
+
+            // Render Pasca
+            const pascaContainer = document.getElementById('checklist-pasca-container');
+            let pascaHtml = '';
+            proyekData.pascaChecklist.forEach(item => {
+                pascaHtml += `
+                    <label class="flex items-center space-x-3 p-3 rounded-xl bg-slate-900 border border-slate-700 hover:border-slate-600 cursor-pointer transition">
+                        <input type="checkbox" ${item.selesai ? 'checked' : ''} onchange="togglePasca(${item.id})" class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 bg-slate-800 border-slate-700">
+                        <span class="text-sm ${item.selesai ? 'line-through text-slate-500' : 'text-slate-200'}">${item.teks}</span>
+                    </label>
+                `;
+            });
+            pascaContainer.innerHTML = pascaHtml;
+            document.getElementById('input-link-final').value = proyekData.linkFinal || '';
+
+            hitungProgresTotal();
+        }
+
+        function simpanIdentitas() {
+            proyekData.namaSiswa = document.getElementById('input-nama-siswa').value;
+            proyekData.kelasSiswa = document.getElementById('select-kelas-siswa').value;
+            simpanDataLokal();
+        }
+
+        function bukaModalTimeline() {
+            document.getElementById('modal-tambah-timeline').classList.remove('hidden');
+            document.getElementById('input-timeline-mulai').value = new Date().toISOString().split('T')[0];
+            document.getElementById('input-timeline-selesai').value = new Date().toISOString().split('T')[0];
+        }
+
+        function tutupModalTimeline() {
+            document.getElementById('modal-tambah-timeline').classList.add('hidden');
+        }
+
+        function simpanTimelineBaru() {
+            let tahapan = document.getElementById('input-timeline-tahap').value;
+            let tugas = document.getElementById('input-timeline-tugas').value;
+            let mulai = document.getElementById('input-timeline-mulai').value;
+            let selesai = document.getElementById('input-timeline-selesai').value;
+
+            if (!tugas) {
+                showToast("Masukkan rincian tugas terlebih dahulu!");
+                return;
+            }
+
+            let dMulai = new Date(mulai);
+            let dSelesai = new Date(selesai);
+            let diffTime = Math.abs(dSelesai - dMulai);
+            let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+            if (diffDays < 1) diffDays = 1;
+
+            proyekData.timeline.push({
+                tahapan, tugas, mulai, selesai, durasi: `${diffDays} Hari`
+            });
+
+            simpanDataLokal();
+            renderSemua();
+            tutupModalTimeline();
+            document.getElementById('input-timeline-tugas').value = '';
+            showToast("Target jadwal berhasil ditambahkan!");
+        }
+
+        function hapusTimeline(idx) {
+            proyekData.timeline.splice(idx, 1);
+            simpanDataLokal();
+            renderSemua();
+            showToast("Timeline dihapus.");
+        }
+
+        function togglePra(id) {
+            let item = proyekData.praChecklist.find(i => i.id === id);
+            if(item) item.selesai = !item.selesai;
+            simpanDataLokal();
+            renderSemua();
+        }
+
+        function toggleAlat(id) {
+            let item = proyekData.alatChecklist.find(i => i.id === id);
+            if(item) item.selesai = !item.selesai;
+            simpanDataLokal();
+            renderSemua();
+        }
+
+        function togglePasca(id) {
+            let item = proyekData.pascaChecklist.find(i => i.id === id);
+            if(item) item.selesai = !item.selesai;
+            simpanDataLokal();
+            renderSemua();
+        }
+
+        function bukaModalLog() {
+            document.getElementById('modal-tambah-log').classList.remove('hidden');
+            document.getElementById('input-log-tanggal').value = new Date().toISOString().split('T')[0];
+        }
+
+        function tutupModalLog() {
+            document.getElementById('modal-tambah-log').classList.add('hidden');
+        }
+
+        function simpanLogBaru() {
+            let tanggal = document.getElementById('input-log-tanggal').value;
+            let lokasi = document.getElementById('input-log-lokasi').value;
+            let adegan = document.getElementById('input-log-adegan').value;
+
+            if (!lokasi || !adegan) {
+                showToast("Isi lokasi dan deskripsi kegiatan!");
+                return;
+            }
+
+            proyekData.logProduksi.push({
+                tanggal: tanggal || new Date().toISOString().split('T')[0],
+                lokasi, adegan, status: 'Selesai'
+            });
+
+            simpanDataLokal();
+            renderSemua();
+            tutupModalLog();
+            document.getElementById('input-log-lokasi').value = '';
+            document.getElementById('input-log-adegan').value = '';
+            showToast("Log kegiatan berhasil ditambahkan!");
+        }
+
+        function hapusLog(idx) {
+            proyekData.logProduksi.splice(idx, 1);
+            simpanDataLokal();
+            renderSemua();
+            showToast("Log dihapus.");
+        }
+
+        function simpanCatatanSutradara() {
+            proyekData.catatanSutradara = document.getElementById('input-catatan-sutradara').value;
+            simpanDataLokal();
+            showToast("Catatan Sutradara disimpan!");
+        }
+
+        function simpanLinkFinal() {
+            proyekData.linkFinal = document.getElementById('input-link-final').value;
+            simpanDataLokal();
+            showToast("Link video final disimpan!");
+        }
+
+        function hitungProgresTotal() {
+            let totalItem = proyekData.praChecklist.length + proyekData.alatChecklist.length + proyekData.pascaChecklist.length;
+            let selesaiItem = proyekData.praChecklist.filter(i=>i.selesai).length + 
+                              proyekData.alatChecklist.filter(i=>i.selesai).length + 
+                              proyekData.pascaChecklist.filter(i=>i.selesai).length;
+            
+            let persen = Math.round((selesaiItem / totalItem) * 100);
+            let labelTahap = "Perencanaan";
+            if(persen > 30) labelTahap = "Pra-Produksi & Syuting";
+            if(persen > 70) labelTahap = "Pasca-Produksi / Finalisasi";
+            if(persen === 100) labelTahap = "Proyek Selesai 100% 🎬";
+
+            document.getElementById('label-progres-total').innerText = `${persen}% (${labelTahap})`;
+        }
+
+        function simpanDataLokal() {
+            proyekData.namaSiswa = document.getElementById('input-nama-siswa').value;
+            proyekData.kelasSiswa = document.getElementById('select-kelas-siswa').value;
+            proyekData.namaKlien = document.getElementById('input-nama-klien').value;
+            proyekData.linkPra = document.getElementById('input-link-pra').value;
+            localStorage.setItem('jurnal_company_profile_xii_pf', JSON.stringify(proyekData));
+        }
+
+        function muatDataLokal() {
+            let saved = localStorage.getItem('jurnal_company_profile_xii_pf');
+            if(saved) proyekData = JSON.parse(saved);
+        }
+
+        function resetData(tahap) {
+            if(confirm("Yakin ingin mereset checklist tahapan ini?")) {
+                if(tahap === 'pra') {
+                    proyekData.praChecklist.forEach(i => i.selesai = false);
+                }
+                simpanDataLokal();
+                renderSemua();
+                showToast("Checklist direset.");
+            }
+        }
+    </script>
+</body>
+</html>
