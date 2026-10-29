@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gear Detective: The Camera Battle</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- html2pdf.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0f172a; 
+            background-image: 
+                radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+                radial-gradient(at 100% 100%, hsla(225,39%,20%,1) 0, transparent 50%);
+            background-attachment: fixed;
+            color: #f8fafc;
+            -webkit-tap-highlight-color: transparent;
+            min-height: 100vh;
+        }
+
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        .page-enter { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Custom Radio Button Card untuk Pilihan Kamera & Kuis */
+        .custom-radio:checked + label {
+            border-color: #3b82f6; 
+            background-color: rgba(59, 130, 246, 0.15);
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+        }
+        .custom-radio:checked + label .check-indicator { opacity: 1; transform: scale(1); }
+
+        /* Print Settings for PDF */
+        @media print {
+            body { background: white !important; color: black !important; }
+            #app-container { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
+            .no-print { display: none !important; }
+        }
+        #pdf-content { background-color: white; color: #0f172a; border-radius: 12px; }
+        .print-only { display: none; }
+        .html2pdf__container .no-print { display: none !important; }
+        .html2pdf__container .print-only { display: block !important; }
+    </style>
+</head>
+<body class="pb-24 pt-4 md:pt-8 px-4 flex flex-col items-center">
+
+    <div class="max-w-xl mx-auto w-full relative z-10 flex flex-col min-h-[90vh]" id="app-container">
+
+        <!-- HEADER -->
+        <header id="main-header" class="text-center mb-6 page-enter">
+            <div class="inline-flex items-center justify-center gap-2 mb-2 bg-slate-800/80 px-3 py-1 rounded-full border border-slate-700">
+                <i class="fas fa-search text-blue-400 text-[10px]"></i>
+                <span class="text-[10px] font-bold text-slate-300 tracking-widest uppercase">SMKN 1 Tasikmalaya - BDF</span>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 uppercase leading-tight drop-shadow-sm">
+                Gear Detective
+            </h1>
+            <h2 class="text-xs md:text-sm font-semibold text-blue-200/80 mt-1 uppercase tracking-widest">Camcorder vs Mirrorless</h2>
+        </header>
+
+        <!-- STEP 1: IDENTITAS & LOGO -->
+        <section id="step-1" class="glass-panel p-6 rounded-3xl page-enter flex-1">
+            <div class="mb-6 border-b border-slate-700 pb-4">
+                <span class="bg-indigo-500/20 text-indigo-300 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider mb-2 inline-block">Tahap 1 / 5</span>
+                <h3 class="text-xl font-bold text-white mt-1">ID Detektif & Atribut</h3>
+                <p class="text-xs text-slate-400 mt-1">Lengkapi lencana identitas dan logo sebelum masuk ke ruang arsip.</p>
+            </div>
+
+            <div class="space-y-5">
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-2 uppercase tracking-wide">Nama Lengkap</label>
+                    <input type="text" id="input-name" class="w-full bg-slate-900/50 border border-slate-600 rounded-xl px-4 py-3 text-sm text-white focus:border-blue-500 outline-none transition" placeholder="Ketik nama Anda...">
+                </div>
+                
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-2 uppercase tracking-wide">Kelas / Divisi</label>
+                    <select id="input-class" class="w-full bg-slate-900/50 border border-slate-600 rounded-xl px-4 py-3 text-sm text-white focus:border-blue-500 outline-none transition appearance-none">
+                        <option value="" disabled selected>-- Pilih Kelas --</option>
+                        <option value="X-BDF 1">X-BDF 1</option>
+                        <option value="X-BDF 2">X-BDF 2</option>
+                        <option value="XI-PF 1">XI-PF 1</option>
+                        <option value="XI-PF 2">XI-PF 2</option>
+                        <option value="XII-PF 1">XII-PF 1</option>
+                        <option value="XII-PF 2">XII-PF 2</option>
+                    </select>
+                </div>
+
+                <!-- Unggah Logo & Foto -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 mb-1.5 uppercase text-center">Logo SMKN 1</label>
+                        <label class="flex flex-col items-center justify-center bg-slate-800 border border-slate-600 border-dashed h-24 rounded-xl cursor-pointer hover:bg-slate-700 transition relative overflow-hidden">
+                            <img id="preview-logo1" class="absolute inset-0 w-full h-full object-contain p-2 hidden z-10 bg-white">
+                            <i class="fas fa-university text-slate-500 text-xl mb-1"></i>
+                            <span class="text-[9px] text-slate-400 font-semibold" id="label-logo1">Unggah</span>
+                            <input type="file" accept="image/*" class="hidden" onchange="handleImageUpload(event, 'preview-logo1', 'data-logo1', 'label-logo1')">
+                        </label>
+                        <input type="hidden" id="data-logo1">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 mb-1.5 uppercase text-center">Logo Jurusan</label>
+                        <label class="flex flex-col items-center justify-center bg-slate-800 border border-slate-600 border-dashed h-24 rounded-xl cursor-pointer hover:bg-slate-700 transition relative overflow-hidden">
+                            <img id="preview-logo2" class="absolute inset-0 w-full h-full object-cover hidden z-10 bg-black">
+                            <i class="fas fa-film text-slate-500 text-xl mb-1"></i>
+                            <span class="text-[9px] text-slate-400 font-semibold" id="label-logo2">Unggah</span>
+                            <input type="file" accept="image/*" class="hidden" onchange="handleImageUpload(event, 'preview-logo2', 'data-logo2', 'label-logo2')">
+                        </label>
+                        <input type="hidden" id="data-logo2">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-2 uppercase tracking-wide">Pas Foto Profil</label>
+                    <label class="flex items-center gap-4 bg-slate-900/40 border border-slate-600 border-dashed p-3 rounded-xl cursor-pointer hover:bg-slate-800 transition group">
+                        <div class="w-14 h-14 rounded-full bg-slate-800 flex items-center justify-center overflow-hidden shrink-0 relative border border-slate-600">
+                            <img id="preview-photo" class="absolute inset-0 w-full h-full object-cover hidden z-10">
+                            <i class="fas fa-camera text-slate-400"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm font-bold text-blue-400" id="label-photo">Unggah Foto</p>
+                            <p class="text-[10px] text-slate-400 mt-0.5">Wajib untuk lisensi PDF</p>
+                        </div>
+                        <input type="file" accept="image/*" class="hidden" onchange="handleImageUpload(event, 'preview-photo', 'data-photo', 'label-photo')">
+                    </label>
+                    <input type="hidden" id="data-photo">
+                </div>
+
+                <button onclick="goToStep2()" class="w-full mt-4 bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 px-4 rounded-xl transition shadow-lg active:scale-95 text-sm uppercase tracking-wider flex justify-center items-center gap-2">
+                    Lanjut Riset <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- STEP 2: RUANG LITERASI (RISET MANDIRI) -->
+        <section id="step-2" class="hidden flex-col flex-1 page-enter w-full">
+            <div class="mb-4 border-b border-slate-700 pb-4">
+                <span class="bg-cyan-500/20 text-cyan-300 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider mb-2 inline-block">Tahap 2 / 5</span>
+                <h3 class="text-xl font-black text-white leading-tight">Ruang Literasi & Riset</h3>
+                <p class="text-[11px] text-slate-400 mt-1">Sutradara butuh analisismu! Silakan buka YouTube / Google Chrome, lalu cari review tentang <strong>Panasonic HC-X2000</strong> dan <strong>Sony A7 II</strong>.</p>
+            </div>
+
+            <div class="space-y-5 glass-panel p-5 rounded-2xl">
+                <div class="bg-slate-800/50 p-3 rounded-lg border border-slate-600 mb-2">
+                    <p class="text-xs text-slate-300 font-semibold"><i class="fas fa-search text-cyan-400 mr-1"></i> Kata Kunci Pencarian (Saran):</p>
+                    <p class="text-[10px] text-slate-400 mt-1">"Kelebihan Camcorder HC-X2000", "Review Sony A7 II untuk Video", "Camcorder vs Mirrorless"</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[10px] font-bold text-emerald-400 mb-2 uppercase tracking-wide">1. Link Referensi Panasonic</label>
+                        <input type="url" id="input-ref-link-cam1" class="w-full bg-slate-900/50 border border-slate-600 rounded-xl px-4 py-3 text-xs text-white focus:border-emerald-500 outline-none transition placeholder-slate-600" placeholder="Paste Link YouTube/Web Panasonic">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-amber-400 mb-2 uppercase tracking-wide">2. Link Referensi Sony A7 II</label>
+                        <input type="url" id="input-ref-link-cam2" class="w-full bg-slate-900/50 border border-slate-600 rounded-xl px-4 py-3 text-xs text-white focus:border-amber-500 outline-none transition placeholder-slate-600" placeholder="Paste Link YouTube/Web Sony A7 II">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-2 uppercase tracking-wide">3. Rangkuman Poin Penting</label>
+                    <p class="text-[9px] text-slate-400 mb-2">Tuliskan minimal 3 perbedaan / poin penting yang kamu dapatkan dari menonton referensi tersebut.</p>
+                    <textarea id="input-ref-summary" rows="5" class="w-full bg-slate-900/50 border border-slate-600 rounded-xl px-4 py-3 text-xs text-white focus:border-cyan-500 outline-none transition placeholder-slate-600" placeholder="1. Camcorder punya ND filter bawaan...&#10;2. Mirrorless Sony A7 II sensornya besar, cocok untuk kondisi gelap...&#10;3. ..."></textarea>
+                </div>
+
+                <button onclick="goToStep3()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-4 rounded-xl transition shadow-lg active:scale-95 text-sm uppercase tracking-wider flex justify-center items-center gap-2">
+                    Simpan Hasil Riset & Lanjut <i class="fas fa-book-open"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- STEP 3: STUDY ROOM (ARSIP TEORI DARI APLIKASI) -->
+        <section id="step-3" class="hidden flex-col flex-1 page-enter w-full">
+            <div class="mb-4 text-center border-b border-slate-700 pb-4">
+                <span class="bg-indigo-500/20 text-indigo-300 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider mb-2 inline-block">Tahap 3 / 5</span>
+                <h3 class="text-xl font-black text-white leading-tight">Arsip Data Kamera</h3>
+                <p class="text-[11px] text-slate-400 mt-1">Cocokkan hasil risetmu dengan data spesifikasi resmi di bawah ini.</p>
+            </div>
+
+            <!-- Kamera A: Camcorder -->
+            <div class="glass-panel p-4 rounded-2xl mb-4 border-l-4 border-l-emerald-500 relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-3 opacity-20"><i class="fas fa-video text-6xl"></i></div>
+                <h4 class="text-lg font-black text-white mb-1 relative z-10">Panasonic HC-X2000</h4>
+                <p class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest mb-3 relative z-10">Kategori: Pro Camcorder (ENG)</p>
+                
+                <ul class="space-y-2 text-xs text-slate-300 relative z-10">
+                    <li class="flex items-start gap-2"><i class="fas fa-check-circle text-emerald-500 mt-0.5"></i> <span><strong>Desain Run-and-Gun:</strong> Langsung rekam, tombol fisik lengkap tanpa perlu rakit aksesoris.</span></li>
+                    <li class="flex items-start gap-2"><i class="fas fa-check-circle text-emerald-500 mt-0.5"></i> <span><strong>Built-in ND Filter:</strong> Punya kacamata hitam bawaan, aman untuk syuting outdoor yang terik siang hari.</span></li>
+                    <li class="flex items-start gap-2"><i class="fas fa-check-circle text-emerald-500 mt-0.5"></i> <span><strong>XLR Audio Port:</strong> Port mic profesional dengan *Phantom Power* (kualitas audio wawancara maksimal).</span></li>
+                    <li class="flex items-start gap-2"><i class="fas fa-check-circle text-emerald-500 mt-0.5"></i> <span><strong>Ketahanan:</strong> Baterai sangat awet dan bisa merekam nonstop tanpa batas waktu (*no overheat*).</span></li>
+                </ul>
+            </div>
+
+            <!-- Kamera B: Mirrorless -->
+            <div class="glass-panel p-4 rounded-2xl mb-6 border-l-4 border-l-amber-500 relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-3 opacity-20"><i class="fas fa-camera text-6xl"></i></div>
+                <h4 class="text-lg font-black text-white mb-1 relative z-10">Sony Alpha 7 II (A7 II)</h4>
+                <p class="text-[10px] font-bold text-amber-400 uppercase tracking-widest mb-3 relative z-10">Kategori: Mirrorless (Hybrid)</p>
+                
+                <ul class="space-y-2 text-xs text-slate-300 relative z-10">
+                    <li class="flex items-start gap-2"><i class="fas fa-check-circle text-amber-500 mt-0.5"></i> <span><strong>Sensor Full-Frame:</strong> Sensor besar, sangat andal merekam di kondisi gelap (Low-Light).</span></li>
+                    <li class="flex items-start gap-2"><i class="fas fa-check-circle text-amber-500 mt-0.5"></i> <span><strong>Interchangeable Lens:</strong> Lensa bisa diganti-ganti (Lensa Fix, Wide, Tele) sesuai kebutuhan seni.</span></li>
+                    <li class="flex items-start gap-2"><i class="fas fa-check-circle text-amber-500 mt-0.5"></i> <span><strong>Depth of Field (Bokeh):</strong> Mampu menghasilkan efek *background blur* yang tebal dan sangat sinematik.</span></li>
+                    <li class="flex items-start gap-2"><i class="fas fa-times-circle text-red-500 mt-0.5"></i> <span><em>Kelemahan:</em> Baterai cepat habis, rawan overheat jika merekam durasi sangat panjang, audio internal standar.</span></li>
+                </ul>
+            </div>
+
+            <button onclick="goToStep4()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl transition shadow-lg active:scale-95 text-sm uppercase tracking-wider flex justify-center items-center gap-2">
+                Saya Siap Terima Misi <i class="fas fa-shield-alt"></i>
+            </button>
+        </section>
+
+        <!-- STEP 4: MISSION ROOM (STUDI KASUS) -->
+        <section id="step-4" class="hidden flex-col flex-1 page-enter w-full">
+            <div class="mb-4 text-center">
+                <span class="bg-rose-500/20 text-rose-300 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider mb-2 inline-block">Tahap 4 / 5</span>
+                <h3 class="text-xl font-black text-white leading-tight">Analisis Kasus Produser</h3>
+                <p class="text-[11px] text-slate-400 mt-1">Tentukan senjata yang tepat untuk setiap tantangan berikut.</p>
+            </div>
+
+            <div class="space-y-6" id="case-container">
+                <!-- Case 1, 2, 3 Akan dirender via JS -->
+            </div>
+
+            <button onclick="goToStep5()" class="w-full mt-8 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 rounded-xl transition shadow-lg active:scale-95 text-sm uppercase tracking-wider flex justify-center items-center gap-2">
+                Simpan & Lanjut Post-Test <i class="fas fa-arrow-right"></i>
+            </button>
+        </section>
+
+        <!-- STEP 5: POST-TEST -->
+        <section id="step-5" class="hidden flex-col flex-1 page-enter w-full">
+            <div class="mb-4 text-center">
+                <span class="bg-purple-500/20 text-purple-300 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider mb-2 inline-block">Tahap Akhir (5 / 5)</span>
+                <h3 class="text-xl font-black text-white leading-tight">Ujian Post-Test</h3>
+                <p class="text-[11px] text-red-400 mt-1 font-bold"><i class="fas fa-exclamation-triangle"></i> Peringatan: Sistem melacak jumlah percobaan Anda.</p>
+            </div>
+
+            <div class="space-y-5" id="quiz-container">
+                <!-- Soal Post-Test dirender via JS -->
+            </div>
+
+            <button onclick="finishAll()" class="w-full mt-8 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold py-4 rounded-xl transition shadow-lg active:scale-95 text-sm uppercase tracking-wider flex justify-center items-center gap-2">
+                Selesai & Lihat Laporan PDF <i class="fas fa-file-contract"></i>
+            </button>
+        </section>
+
+        <!-- STEP 6: HASIL (PDF READY) -->
+        <section id="step-6" class="hidden page-enter w-full pb-10">
+            <div id="pdf-content" class="shadow-2xl relative border border-slate-200 bg-white">
+                
+                <!-- HEADER LAPORAN -->
+                <div class="bg-slate-900 p-6 flex items-center justify-between border-b-4 border-blue-600 print-only:flex">
+                    <img id="res-logo1" src="" class="w-14 h-14 bg-white rounded-full object-contain p-1 shrink-0 hidden border-2 border-slate-400">
+                    <div class="text-center px-4 flex-1">
+                        <h1 class="text-lg md:text-xl font-black uppercase tracking-widest text-white leading-none">SMKN 1 Tasikmalaya</h1>
+                        <h2 class="text-[10px] md:text-xs font-bold text-blue-400 mt-1.5 uppercase tracking-widest">Program Keahlian Broadcasting & Film</h2>
+                        <p class="text-[9px] text-slate-400 mt-1">T.A 2026/2027</p>
+                    </div>
+                    <img id="res-logo2" src="" class="w-14 h-14 bg-black rounded-full object-cover shrink-0 hidden border-2 border-slate-600">
+                </div>
+
+                <div class="bg-slate-100 text-center py-2 border-b border-slate-200">
+                    <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Laporan Evaluasi Pra-Produksi</p>
+                    <h3 class="text-sm font-black text-slate-800 uppercase tracking-wider">Analisis Peralatan Kamera</h3>
+                </div>
+
+                <div class="p-6">
+                    <!-- INFO DETEKTIF & ANTI CHEAT -->
+                    <div class="bg-white border border-slate-200 rounded-xl p-4 flex items-center gap-4 shadow-sm relative overflow-hidden mb-6">
+                        <img id="res-photo" src="" class="w-16 h-16 object-cover rounded-full border-2 border-slate-200 bg-slate-100 shrink-0 relative z-10 hidden">
+                        <div class="flex-1 relative z-10">
+                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Nama Analis</p>
+                            <h3 class="text-lg font-black text-slate-900 leading-tight mt-0.5" id="res-name">Nama Siswa</h3>
+                            <p class="text-[10px] font-bold text-blue-700 bg-blue-50 inline-block px-2 py-0.5 rounded mt-1 border border-blue-100" id="res-class">Kelas</p>
+                        </div>
+                        <div class="text-center border-l border-slate-200 pl-4 relative z-10 flex flex-col items-center">
+                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Total Nilai</p>
+                            <div class="w-12 h-12 rounded-full border-4 flex items-center justify-center text-lg font-black" id="res-score-circle">0</div>
+                            <div id="res-attempt-badge" class="mt-2 text-[8px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">1x Percobaan</div>
+                        </div>
+                    </div>
+
+                    <!-- HASIL LITERASI -->
+                    <div class="mb-5">
+                        <h4 class="text-[11px] font-black text-slate-800 border-b-2 border-slate-800 pb-1 mb-2 uppercase tracking-wider">A. Hasil Literasi / Riset Video</h4>
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-[10px] text-slate-700">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
+                                <div>
+                                    <p class="font-bold text-emerald-600 mb-0.5">Link Panasonic HC-X2000:</p>
+                                    <p class="break-all italic text-[9px] text-slate-600" id="res-ref-link-cam1">-</p>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-amber-600 mb-0.5">Link Sony A7 II:</p>
+                                    <p class="break-all italic text-[9px] text-slate-600" id="res-ref-link-cam2">-</p>
+                                </div>
+                            </div>
+                            <p class="font-bold text-slate-800 mb-1 border-t border-slate-200 pt-2">Poin Rangkuman:</p>
+                            <p class="whitespace-pre-line leading-relaxed" id="res-ref-summary">-</p>
+                        </div>
+                    </div>
+
+                    <!-- HASIL ANALISIS KASUS -->
+                    <div class="mb-5">
+                        <h4 class="text-[11px] font-black text-slate-800 border-b-2 border-slate-800 pb-1 mb-2 uppercase tracking-wider flex justify-between">
+                            B. Rincian Studi Kasus <span class="text-slate-500 font-medium" id="res-case-score">(0 Poin)</span>
+                        </h4>
+                        <div class="space-y-2" id="res-case-list"></div>
+                    </div>
+
+                    <!-- HASIL POST TEST -->
+                    <div class="mb-5">
+                        <h4 class="text-[11px] font-black text-slate-800 border-b-2 border-slate-800 pb-1 mb-2 uppercase tracking-wider flex justify-between">
+                            C. Hasil Ujian Post-Test <span class="text-slate-500 font-medium" id="res-quiz-score">(0 Poin)</span>
+                        </h4>
+                        <div class="space-y-2" id="res-quiz-list"></div>
+                    </div>
+
+                    <!-- PENGESAHAN -->
+                    <div class="mt-8 pt-4 flex justify-between items-end print-only:flex">
+                        <div class="text-center w-32">
+                            <p class="text-[9px] text-slate-500 mb-12">Mengetahui, Instruktur/Guru</p>
+                            <div class="border-b border-slate-800 pb-1"></div>
+                        </div>
+                        <div class="text-center w-32">
+                            <p class="text-[9px] text-slate-500 mb-12">Analis Produksi,</p>
+                            <div class="border-b border-slate-800 pb-1">
+                                <p class="text-[10px] font-bold text-slate-800 truncate" id="res-ttd">-</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <p class="text-[8px] text-slate-400 text-center mt-6 print-only:block">Dicetak via Aplikasi Gear Detective pada <span id="res-date" class="font-semibold"></span></p>
+                </div>
+            </div>
+
+            <!-- Tombol Aksi Bawah -->
+            <div class="mt-6 flex flex-col md:flex-row gap-3 no-print w-full">
+                <button onclick="exportToPDF()" id="btn-export" class="flex-[2] py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg transition text-sm flex items-center justify-center gap-2 active:scale-95">
+                    <i class="fas fa-file-pdf"></i> Bagikan / Simpan PDF
+                </button>
+                <button onclick="location.reload()" class="flex-1 py-4 bg-slate-200 text-slate-700 font-bold rounded-xl text-sm transition active:scale-95">
+                    Ulangi
+                </button>
+            </div>
+            
+            <!-- FALLBACK CETAK SISTEM -->
+            <div id="download-warning" class="hidden mt-2 p-4 bg-red-50 border border-red-200 rounded-xl text-center no-print mb-8 shadow-sm">
+                <p class="text-xs text-red-600 font-bold mb-1 flex items-center justify-center gap-1"><i class="fas fa-exclamation-triangle"></i> Menu Berbagi Terblokir?</p>
+                <p class="text-[10px] text-slate-600 mb-3 leading-relaxed">Sistem HP Anda memblokir unduhan. Gunakan tombol di bawah lalu ubah pilihan Printer menjadi <strong class="text-slate-800">"Simpan sebagai PDF"</strong>.</p>
+                <button onclick="window.print()" class="w-full py-3 bg-slate-800 text-white font-bold rounded-xl text-xs shadow-lg active:scale-95 transition flex items-center justify-center gap-2">
+                    <i class="fas fa-print"></i> Gunakan Cetak Sistem (Print PDF)
+                </button>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- TOAST ALERT -->
+    <div id="toast" class="fixed top-5 left-1/2 transform -translate-x-1/2 -translate-y-[150%] bg-slate-900 border border-slate-700 text-white px-5 py-3 rounded-full shadow-2xl transition-all duration-300 z-[100] flex items-center gap-3 w-max max-w-[90vw] opacity-0 pointer-events-none">
+        <i id="toast-icon" class="fas fa-info-circle text-blue-400"></i>
+        <p class="text-xs font-bold whitespace-normal" id="toast-msg">Pesan</p>
+    </div>
+
+    <script>
+        // --- DATA STATE ---
+        let studentData = { name: "", class: "", photo: "", logo1: "", logo2: "", refLinkCam1: "", refLinkCam2: "", refSummary: "" };
+        
+        // Data Misi/Kasus (Skor Max 50)
+        const cases = [
+            {
+                id: "case1", title: "Kasus #1: Film Pendek Sinematik",
+                desc: "Sutradara menginginkan gambar yang sangat fokus pada wajah aktor dengan latar belakang yang blur (bokeh) agar emosi tersampaikan.",
+                camCorrect: "A7II",
+                camOptions: [ { val: "HCX2000", label: "Panasonic HC-X2000", icon: "fa-video" }, { val: "A7II", label: "Sony A7 II", icon: "fa-camera" } ],
+                reasonOptions: [
+                    { id: "c1_r1", text: "Bodinya kecil jadi aktor tidak gugup." },
+                    { id: "c1_r2", text: "Sensor Full-Frame & lensa interchangeable menghasilkan efek bokeh yang tebal." },
+                    { id: "c1_r3", text: "Bisa merekam berjam-jam tanpa perlu ganti baterai." }
+                ],
+                reasonCorrect: "c1_r2", score: 17
+            },
+            {
+                id: "case2", title: "Kasus #2: Liputan Turnamen Futsal",
+                desc: "Mereka meminta Anda merekam pertandingan futsal secara penuh selama 2 jam tanpa henti. Pemain bergerak sangat cepat.",
+                camCorrect: "HCX2000",
+                camOptions: [ { val: "HCX2000", label: "Panasonic HC-X2000", icon: "fa-video" }, { val: "A7II", label: "Sony A7 II", icon: "fa-camera" } ],
+                reasonOptions: [
+                    { id: "c2_r1", text: "Camcorder didesain untuk merekam nonstop tanpa overheat & punya servo zoom." },
+                    { id: "c2_r2", text: "Kualitas sensor full-frame sangat bagus untuk olahraga." },
+                    { id: "c2_r3", text: "Audio internalnya lebih jernih menangkap suara bola." }
+                ],
+                reasonCorrect: "c2_r1", score: 17
+            },
+            {
+                id: "case3", title: "Kasus #3: Wawancara Outdoor (Terik & Angin)",
+                desc: "Wawancara siang bolong (sangat terik). Diwajibkan menggunakan Mikrofon XLR Eksternal agar suara angin teredam.",
+                camCorrect: "HCX2000",
+                camOptions: [ { val: "HCX2000", label: "Panasonic HC-X2000", icon: "fa-video" }, { val: "A7II", label: "Sony A7 II", icon: "fa-camera" } ],
+                reasonOptions: [
+                    { id: "c3_r1", text: "Bodinya terlihat profesional di depan narasumber." },
+                    { id: "c3_r2", text: "Punya ND Filter bawaan (meredam silau) & Port XLR bawaan." },
+                    { id: "c3_r3", text: "Bisa dipasangi lensa tele yang panjang." }
+                ],
+                reasonCorrect: "c3_r2", score: 16
+            }
+        ];
+
+        let caseAnswers = { case1: { cam: null, reason: null }, case2: { cam: null, reason: null }, case3: { cam: null, reason: null } };
+
+        // Data Kuis Post-Test (Skor Max 50)
+        const quizData = [
+            { q: "Fitur utama pada Camcorder HC-X2000 yang berfungsi menahan silau cahaya matahari tanpa perlu menambah aksesoris eksternal adalah?", opts: ["A. Servo Zoom", "B. ND Filter (Neutral Density)", "C. XLR Port", "D. Full-Frame Sensor"], ans: 1 },
+            { q: "Apa keunggulan utama sensor Full-Frame pada kamera Mirrorless (seperti Sony A7 II) untuk produksi video?", opts: ["A. Baterai jauh lebih awet.", "B. Handal di kondisi minim cahaya (low-light) dan background mudah blur.", "C. Tidak akan pernah mengalami overheat.", "D. Audio internal yang setara dengan studio."], ans: 1 },
+            { q: "Port (colokan) standar profesional yang ada pada HC-X2000 untuk menyambungkan mikrofon eksternal (Shotgun/Clip-on) adalah?", opts: ["A. USB Type C", "B. Jack 3.5mm", "C. XLR (dengan Phantom Power)", "D. HDMI Out"], ans: 2 },
+            { q: "Risiko paling besar jika kita memaksa menggunakan kamera Mirrorless (A7 II) untuk merekam acara durasi panjang (3 jam non-stop) adalah?", opts: ["A. Gambar menjadi hitam putih.", "B. Kamera bisa mengalami Overheat (panas berlebih) dan baterai cepat habis.", "C. Kamera otomatis terformat.", "D. Lensa tidak bisa fokus."], ans: 1 },
+            { q: "Istilah 'Run-and-Gun' merujuk pada alat yang siap pakai dengan cepat tanpa banyak rakitan. Kamera manakah yang paling sesuai dengan profil ini?", opts: ["A. RED Cinema Camera", "B. Sony A7 II (Mirrorless)", "C. Panasonic HC-X2000 (Camcorder ENG)", "D. Kamera Analog Film"], ans: 2 }
+        ];
+        let quizAnswers = new Array(quizData.length).fill(null);
+
+        // --- UTILITIES ---
+        function showToast(msg, type = 'info') {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            const icon = document.getElementById('toast-icon');
+            
+            if(type === 'error') { icon.className = "fas fa-exclamation-circle text-red-500"; } 
+            else { icon.className = "fas fa-check-circle text-emerald-400"; }
+            
+            toast.classList.remove('-translate-y-[150%]', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('-translate-y-[150%]', 'opacity-0');
+            }, 3000);
+        }
+
+        function handleImageUpload(event, previewId, dataId, labelId) {
+            const file = event.target.files[0];
+            if (file) {
+                if(file.size > 2 * 1024 * 1024) return showToast("Maksimal ukuran foto/logo 2MB!", 'error');
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    document.getElementById(dataId).value = e.target.result;
+                    document.getElementById(previewId).src = e.target.result;
+                    document.getElementById(previewId).classList.remove('hidden');
+                    document.getElementById(labelId).innerText = "Tersimpan";
+                    document.getElementById(labelId).classList.replace('text-slate-400', 'text-emerald-400');
+                    if(labelId === 'label-photo') document.getElementById(labelId).classList.replace('text-blue-400', 'text-emerald-400');
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // --- NAVIGATION ---
+        function goToStep2() {
+            studentData.name = document.getElementById('input-name').value.trim();
+            studentData.class = document.getElementById('input-class').value;
+            studentData.photo = document.getElementById('data-photo').value;
+            studentData.logo1 = document.getElementById('data-logo1').value;
+            studentData.logo2 = document.getElementById('data-logo2').value;
+
+            if (!studentData.name || !studentData.class || !studentData.photo || !studentData.logo1 || !studentData.logo2) {
+                return showToast("Mohon lengkapi Nama, Kelas, & unggah ke-3 Gambar!", 'error');
+            }
+
+            document.getElementById('step-1').classList.add('hidden');
+            document.getElementById('step-2').classList.remove('hidden');
+            document.getElementById('step-2').classList.add('flex');
+            window.scrollTo(0, 0);
+        }
+
+        function goToStep3() {
+            studentData.refLinkCam1 = document.getElementById('input-ref-link-cam1').value.trim();
+            studentData.refLinkCam2 = document.getElementById('input-ref-link-cam2').value.trim();
+            studentData.refSummary = document.getElementById('input-ref-summary').value.trim();
+
+            if(!studentData.refLinkCam1 || !studentData.refLinkCam2 || !studentData.refSummary) {
+                return showToast("Mohon isi kedua Tautan Referensi dan Rangkuman hasil literasi!", "error");
+            }
+
+            document.getElementById('step-2').classList.replace('flex', 'hidden');
+            document.getElementById('step-3').classList.remove('hidden');
+            document.getElementById('step-3').classList.add('flex');
+            window.scrollTo(0, 0);
+        }
+
+        function goToStep4() {
+            renderCases();
+            document.getElementById('step-3').classList.replace('flex', 'hidden');
+            document.getElementById('step-4').classList.remove('hidden');
+            document.getElementById('step-4').classList.add('flex');
+            window.scrollTo(0, 0);
+        }
+
+        function goToStep5() {
+            // Validasi Kasus
+            let allCaseAnswered = true;
+            cases.forEach(c => { if (!caseAnswers[c.id].cam || !caseAnswers[c.id].reason) allCaseAnswered = false; });
+            if (!allCaseAnswered) return showToast("Pilih Kamera dan Alasan untuk semua kasus!", "error");
+
+            renderQuiz();
+            document.getElementById('step-4').classList.replace('flex', 'hidden');
+            document.getElementById('step-5').classList.remove('hidden');
+            document.getElementById('step-5').classList.add('flex');
+            window.scrollTo(0, 0);
+        }
+
+        // --- RENDER KASUS & KUIS ---
+        function renderCases() {
+            const container = document.getElementById('case-container');
+            container.innerHTML = "";
+            cases.forEach((c) => {
+                let camHTML = `<div class="grid grid-cols-2 gap-3 mb-4">`;
+                c.camOptions.forEach(opt => {
+                    camHTML += `
+                        <div class="relative">
+                            <input type="radio" name="${c.id}_cam" id="${c.id}_${opt.val}" value="${opt.val}" class="custom-radio hidden" onchange="caseAnswers.${c.id}.cam = '${opt.val}'">
+                            <label for="${c.id}_${opt.val}" class="flex flex-col items-center justify-center p-3 border border-slate-600 rounded-xl cursor-pointer bg-slate-900/50 transition">
+                                <i class="fas ${opt.icon} text-2xl text-slate-400 mb-2"></i>
+                                <span class="text-[10px] font-bold text-center text-slate-200">${opt.label}</span>
+                                <div class="check-indicator absolute top-2 right-2 opacity-0 transition-transform transform scale-50"><i class="fas fa-check-circle text-blue-500"></i></div>
+                            </label>
+                        </div>
+                    `;
+                });
+                camHTML += `</div>`;
+
+                let reasonHTML = `
+                    <label class="block text-[10px] font-bold text-slate-400 mb-1 uppercase">Pilih Alasan Teknis:</label>
+                    <div class="relative">
+                        <select id="${c.id}_reason" class="w-full bg-slate-900/50 border border-slate-600 rounded-xl px-3 py-3 text-xs text-white outline-none focus:border-blue-500 appearance-none transition" onchange="caseAnswers.${c.id}.reason = this.value">
+                            <option value="" disabled selected>-- Pilih Alasan --</option>
+                `;
+                c.reasonOptions.forEach(opt => { reasonHTML += `<option value="${opt.id}">${opt.text}</option>`; });
+                reasonHTML += `</select><i class="fas fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-400 text-[10px] pointer-events-none"></i></div>`;
+
+                container.innerHTML += `<div class="glass-panel p-5 rounded-2xl border-l-4 border-l-blue-500"><h4 class="text-sm font-black text-white mb-2">${c.title}</h4><p class="text-xs text-slate-300 mb-4 leading-relaxed bg-slate-800/50 p-3 rounded-lg">${c.desc}</p>${camHTML}${reasonHTML}</div>`;
+            });
+        }
+
+        function renderQuiz() {
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = "";
+            quizData.forEach((q, qIndex) => {
+                let optsHTML = "";
+                q.opts.forEach((opt, oIndex) => {
+                    optsHTML += `
+                        <div class="relative mt-2">
+                            <input type="radio" name="q${qIndex}" id="q${qIndex}_${oIndex}" value="${oIndex}" class="custom-radio hidden" onchange="quizAnswers[${qIndex}] = ${oIndex}">
+                            <label for="q${qIndex}_${oIndex}" class="flex items-start gap-3 p-3 border border-slate-600 rounded-xl cursor-pointer bg-slate-900/50 transition">
+                                <div class="check-indicator w-4 h-4 rounded-full border border-slate-400 shrink-0 mt-0.5 flex items-center justify-center transition"><div class="w-2 h-2 rounded-full bg-white opacity-0 transition"></div></div>
+                                <span class="text-[11px] font-semibold text-slate-300">${opt}</span>
+                            </label>
+                        </div>
+                    `;
+                });
+                container.innerHTML += `<div class="glass-panel p-4 rounded-2xl"><p class="text-xs font-bold text-white leading-snug"><span class="text-purple-400">${qIndex+1}.</span> ${q.q}</p>${optsHTML}</div>`;
+            });
+        }
+
+        // Listener untuk Kuis (Efek isi radio)
+        document.addEventListener('change', function(e) {
+            if(e.target.name && e.target.name.startsWith('q')) {
+                const radios = document.querySelectorAll(`input[name="${e.target.name}"]`);
+                radios.forEach(r => {
+                    const innerCircle = r.nextElementSibling.querySelector('div > div');
+                    if(r.checked) innerCircle.classList.replace('opacity-0', 'opacity-100');
+                    else innerCircle.classList.replace('opacity-100', 'opacity-0');
+                });
+            }
+        });
+
+        // --- EVALUASI & PDF ---
+        function finishAll() {
+            if (quizAnswers.includes(null)) return showToast("Mohon jawab semua pertanyaan Post-Test!", "error");
+
+            // 1. Anti Cheat Tracker (Simpan ke localStorage berdasarkan nama)
+            const trackKey = 'gd_attempt_' + studentData.class.replace(/\s/g,'') + '_' + studentData.name.replace(/\s/g,'').toLowerCase();
+            let attempts = parseInt(localStorage.getItem(trackKey)) || 0;
+            attempts++;
+            localStorage.setItem(trackKey, attempts);
+
+            let attemptBadgeHTML = "";
+            if(attempts === 1) attemptBadgeHTML = `<div class="mt-2 text-[8px] font-bold px-2 py-0.5 rounded uppercase tracking-wider bg-emerald-100 text-emerald-700 border border-emerald-200">1x Percobaan (Murni)</div>`;
+            else attemptBadgeHTML = `<div class="mt-2 text-[8px] font-bold px-2 py-0.5 rounded uppercase tracking-wider bg-red-100 text-red-700 border border-red-200">Percobaan ke-${attempts} (Mengulang)</div>`;
+            
+            document.getElementById('res-attempt-badge').outerHTML = attemptBadgeHTML;
+
+            // 2. Hitung Nilai Kasus (Max 50)
+            let scoreCases = 0;
+            let reportCaseHTML = "";
+            cases.forEach(c => {
+                const ans = caseAnswers[c.id];
+                const isCamCorrect = ans.cam === c.camCorrect;
+                const isReasonCorrect = ans.reason === c.reasonCorrect;
+                
+                let points = 0;
+                if(isCamCorrect && isReasonCorrect) points = c.score;
+                else if (isCamCorrect || isReasonCorrect) points = Math.floor(c.score / 2);
+                scoreCases += points;
+
+                const camName = c.camOptions.find(o => o.val === ans.cam).label;
+                const reasonText = c.reasonOptions.find(o => o.id === ans.reason).text;
+                const bgClass = (isCamCorrect && isReasonCorrect) ? "bg-emerald-50 border-emerald-200" : (points>0 ? "bg-amber-50 border-amber-200" : "bg-red-50 border-red-200");
+                const iconClass = (isCamCorrect && isReasonCorrect) ? "text-emerald-500 fa-check-circle" : (points>0 ? "text-amber-500 fa-exclamation-circle" : "text-red-500 fa-times-circle");
+
+                reportCaseHTML += `
+                    <div class="${bgClass} border p-2.5 rounded-lg">
+                        <p class="text-[9px] font-bold text-slate-500 mb-1 truncate">${c.title}</p>
+                        <div class="flex items-start gap-2">
+                            <i class="fas ${iconClass} mt-0.5"></i>
+                            <div>
+                                <p class="text-[10px] font-bold text-slate-800">Cam: ${camName}</p>
+                                <p class="text-[9px] text-slate-600 mt-0.5 leading-snug">Rsn: "${reasonText}"</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('res-case-score').innerText = `(${scoreCases}/50 Poin)`;
+            document.getElementById('res-case-list').innerHTML = reportCaseHTML;
+
+            // 3. Hitung Nilai Kuis (Max 50)
+            let scoreQuiz = 0;
+            let reportQuizHTML = "";
+            quizData.forEach((q, idx) => {
+                const isCorrect = quizAnswers[idx] === q.ans;
+                if(isCorrect) scoreQuiz += 10;
+                
+                reportQuizHTML += `
+                    <div class="bg-slate-50 border ${isCorrect ? 'border-emerald-200' : 'border-red-200'} p-2 rounded-lg flex justify-between items-center gap-2">
+                        <p class="text-[9px] font-medium text-slate-700 truncate flex-1">${idx+1}. ${q.q}</p>
+                        <span class="text-[8px] font-black px-1.5 py-0.5 rounded uppercase ${isCorrect ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}">${isCorrect ? 'Benar' : 'Salah'}</span>
+                    </div>
+                `;
+            });
+            document.getElementById('res-quiz-score').innerText = `(${scoreQuiz}/50 Poin)`;
+            document.getElementById('res-quiz-list').innerHTML = reportQuizHTML;
+
+            // Total Score
+            const totalScore = scoreCases + scoreQuiz;
+            const circle = document.getElementById('res-score-circle');
+            circle.innerText = totalScore;
+            if(totalScore >= 80) circle.className = "w-12 h-12 rounded-full border-4 flex items-center justify-center text-lg font-black border-emerald-200 bg-emerald-100 text-emerald-700";
+            else if(totalScore >= 50) circle.className = "w-12 h-12 rounded-full border-4 flex items-center justify-center text-lg font-black border-amber-200 bg-amber-100 text-amber-700";
+            else circle.className = "w-12 h-12 rounded-full border-4 flex items-center justify-center text-lg font-black border-red-200 bg-red-100 text-red-700";
+
+            // Populate Info
+            document.getElementById('res-name').innerText = studentData.name;
+            document.getElementById('res-ttd').innerText = studentData.name;
+            document.getElementById('res-class').innerText = studentData.class;
+            
+            document.getElementById('res-photo').src = studentData.photo;
+            document.getElementById('res-photo').classList.remove('hidden');
+            
+            document.getElementById('res-logo1').src = studentData.logo1;
+            document.getElementById('res-logo1').classList.remove('hidden');
+            document.getElementById('res-logo2').src = studentData.logo2;
+            document.getElementById('res-logo2').classList.remove('hidden');
+
+            document.getElementById('res-ref-link-cam1').innerText = studentData.refLinkCam1;
+            document.getElementById('res-ref-link-cam2').innerText = studentData.refLinkCam2;
+            document.getElementById('res-ref-summary').innerText = studentData.refSummary;
+
+            const dt = new Date();
+            document.getElementById('res-date').innerText = dt.toLocaleDateString('id-ID', {day: 'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit'});
+
+            // Switch Screen
+            document.getElementById('main-header').classList.add('hidden');
+            document.getElementById('step-5').classList.replace('flex', 'hidden');
+            document.body.style.background = "white"; 
+            document.getElementById('step-6').classList.remove('hidden');
+            window.scrollTo(0, 0);
+        }
+
+        // --- PDF EXPORT ---
+        function exportToPDF() {
+            showToast("Sedang memproses PDF...");
+            window.scrollTo(0,0); 
+            
+            const btn = document.getElementById('btn-export');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Memproses...`;
+            btn.disabled = true;
+
+            const element = document.getElementById('pdf-content');
+            const fileName = `AnalisisKamera_${studentData.class.replace(/\s/g,'')}_${studentData.name.replace(/\s+/g, '')}.pdf`;
+            
+            const opt = {
+                margin:       0,
+                filename:     fileName,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
+                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).outputPdf('blob').then(function(pdfBlob) {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+
+                const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
+
+                if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+                    navigator.share({
+                        files: [pdfFile],
+                        title: 'Laporan Analisis Alat',
+                        text: 'Berikut adalah hasil laporan literasi dan analisis alat.'
+                    }).then(() => {
+                        showToast("Berhasil memanggil menu Share!");
+                    }).catch((error) => {
+                        document.getElementById('download-warning').classList.remove('hidden');
+                        window.scrollTo(0, document.body.scrollHeight);
+                    });
+                } else {
+                    try {
+                        const blobUrl = URL.createObjectURL(pdfBlob);
+                        const link = document.createElement('a');
+                        link.href = blobUrl;
+                        link.download = fileName;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
+                    } catch (e) {
+                        console.error(e);
+                    }
+                    document.getElementById('download-warning').classList.remove('hidden');
+                    window.scrollTo(0, document.body.scrollHeight);
+                }
+            }).catch(err => {
+                showToast("Gagal memproses PDF.", 'error');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            });
+        }
+    </script>
+</body>
+</html>
