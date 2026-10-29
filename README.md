@@ -6,3 +6,4 @@ K3LH Broadcasting dan Perfilman : https://sadrambdf.github.io/bdf/k3lh_produksi_
 Videografi : https://sadrambdf.github.io/bdf/videografi.html  
 Editing Dasar 1 : https://sadrambdf.github.io/bdf/editing_dasar.html  
 Editing Dasar 2 : https://sadrambdf.github.io/bdf/editing_audio_video_film.html
+Mengenal Kamera Video : https://sadrambdf.github.io/bdf/kamera_video.html
