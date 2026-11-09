@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Audio Engineer Bootcamp - BDF</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- html2pdf.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0f172a; 
+            background-image: 
+                radial-gradient(at 0% 0%, hsla(160, 100%, 20%, 0.4) 0, transparent 50%), 
+                radial-gradient(at 100% 100%, hsla(225, 39%, 20%, 1) 0, transparent 50%);
+            background-attachment: fixed;
+            color: #f8fafc;
+            -webkit-tap-highlight-color: transparent;
+            min-height: 100vh;
+        }
+
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        .page-enter { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Checkbox Custom SOP */
+        .sop-checkbox:checked + label {
+            background-color: rgba(16, 185, 129, 0.15);
+            border-color: #10b981;
+        }
+        .sop-checkbox:checked + label .check-icon {
+            background-color: #10b981;
+            border-color: #10b981;
+            color: white;
+        }
+        .sop-checkbox:checked + label .sop-text {
+            text-decoration: line-through;
+            color: #94a3b8;
+        }
+
+        /* Radio Kuis */
+        .quiz-radio:checked + label {
+            background-color: rgba(59, 130, 246, 0.15);
+            border-color: #3b82f6;
+            transform: scale(1.01);
+        }
+        .quiz-radio:checked + label .indicator {
+            background-color: #3b82f6;
+            border-color: #3b82f6;
+        }
+
+        /* Audio Wave Animation */
+        .wave-bar {
+            animation: wave-anim 1s ease-in-out infinite alternate;
+        }
+        .wave-bar:nth-child(2) { animation-delay: 0.2s; }
+        .wave-bar:nth-child(3) { animation-delay: 0.4s; }
+        .wave-bar:nth-child(4) { animation-delay: 0.6s; }
+        
+        @keyframes wave-anim {
+            0% { height: 8px; }
+            100% { height: 24px; }
+        }
+
+        /* Print Settings for PDF */
+        @media print {
+            body { background: white !important; color: black !important; }
+            #app-container { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
+            .no-print { display: none !important; }
+        }
+        #pdf-content { background-color: white; color: #0f172a; border-radius: 12px; }
+        .print-only { display: none; }
+        .html2pdf__container .no-print { display: none !important; }
+        .html2pdf__container .print-only { display: block !important; }
+    </style>
+</head>
+<body class="pb-24 pt-4 md:pt-8 px-4 flex flex-col items-center">
+
+    <div class="max-w-xl mx-auto w-full relative z-10 flex flex-col min-h-[90vh]" id="app-container">
+
+        <!-- HEADER -->
+        <header id="main-header" class="text-center mb-6 page-enter">
+            <div class="flex items-center justify-center gap-1 mb-2">
+                <div class="w-1.5 wave-bar bg-emerald-400 rounded-full"></div>
+                <div class="w-1.5 wave-bar bg-emerald-400 rounded-full"></div>
+                <div class="w-1.5 wave-bar bg-emerald-400 rounded-full"></div>
+                <div class="w-1.5 wave-bar bg-emerald-400 rounded-full"></div>
+            </div>
+            <h1 class="text-2xl md:text-3xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 uppercase leading-tight drop-shadow-sm mt-2">
+                Audio Engineer
+            </h1>
+            <h2 class="text-xs md:text-sm font-semibold text-emerald-200/80 mt-1 uppercase tracking-widest">Saramonic Bootcamp</h2>
+        </header>
+
+        <!-- STEP 1: IDENTITAS & LOGO -->
+        <section id="step-1" class="glass-panel p-6 rounded-3xl page-enter flex-1">
+            <div class="mb-6 border-b border-slate-700 pb-4">
+                <span class="bg-indigo-500/20 text-indigo-300 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider mb-2 inline-block">Tahap 1 / 4</span>
+                <h3 class="text-xl font-bold text-white mt-1">Registrasi Tim Audio</h3>
+                <p class="text-[11px] text-slate-400 mt-1">Lengkapi data kru dan pas foto sebelum masuk ke materi Bootcamp.</p>
+            </div>
+
+            <div class="space-y-5">
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-300 mb-2 uppercase tracking-wide">Nama Siswa / Kelompok</label>
+                    <input type="text" id="input-name" class="w-full bg-slate-900/50 border border-slate-600 rounded-xl px-4 py-3 text-sm text-white focus:border-emerald-500 outline-none transition" placeholder="Contoh: Budi (Mandiri) atau Kelompok 1">
+                </div>
+                
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-300 mb-2 uppercase tracking-wide">Kelas</label>
+                    <select id="input-class" class="w-full bg-slate-900/50 border border-slate-600 rounded-xl px-4 py-3 text-sm text-white focus:border-emerald-500 outline-none transition appearance-none">
+                        <option value="" disabled selected>-- Pilih Kelas --</option>
+                        <option value="X-BDF 1">X-BDF 1</option>
+                        <option value="X-BDF 2">X-BDF 2</option>
+                        <option value="XI-PF 1">XI-PF 1</option>
+                        <option value="XI-PF 2">XI-PF 2</option>
+                        <option value="XII-PF 1">XII-PF 1</option>
+                        <option value="XII-PF 2">XII-PF 2</option>
+                    </select>
+                </div>
+
+                <!-- Unggah Logo & Foto -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 mb-1.5 uppercase text-center">Logo SMKN 1</label>
+                        <label class="flex flex-col items-center justify-center bg-slate-800 border border-slate-600 border-dashed h-24 rounded-xl cursor-pointer hover:bg-slate-700 transition relative overflow-hidden">
+                            <img id="preview-logo1" class="absolute inset-0 w-full h-full object-contain p-2 hidden z-10 bg-white">
+                            <i class="fas fa-university text-slate-500 text-xl mb-1"></i>
+                            <span class="text-[9px] text-slate-400 font-semibold" id="label-logo1">Unggah</span>
+                            <input type="file" accept="image/*" class="hidden" onchange="handleImageUpload(event, 'preview-logo1', 'data-logo1', 'label-logo1')">
+                        </label>
+                        <input type="hidden" id="data-logo1">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 mb-1.5 uppercase text-center">Logo Jurusan</label>
+                        <label class="flex flex-col items-center justify-center bg-slate-800 border border-slate-600 border-dashed h-24 rounded-xl cursor-pointer hover:bg-slate-700 transition relative overflow-hidden">
+                            <img id="preview-logo2" class="absolute inset-0 w-full h-full object-cover hidden z-10 bg-black">
+                            <i class="fas fa-film text-slate-500 text-xl mb-1"></i>
+                            <span class="text-[9px] text-slate-400 font-semibold" id="label-logo2">Unggah</span>
+                            <input type="file" accept="image/*" class="hidden" onchange="handleImageUpload(event, 'preview-logo2', 'data-logo2', 'label-logo2')">
+                        </label>
+                        <input type="hidden" id="data-logo2">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-300 mb-2 uppercase tracking-wide">Foto Profil Kru / Siswa</label>
+                    <label class="flex items-center gap-4 bg-slate-900/40 border border-slate-600 border-dashed p-3 rounded-xl cursor-pointer hover:bg-slate-800 transition group">
+                        <div class="w-14 h-14 rounded-full bg-slate-800 flex items-center justify-center overflow-hidden shrink-0 relative border border-slate-600">
+                            <img id="preview-photo" class="absolute inset-0 w-full h-full object-cover hidden z-10">
+                            <i class="fas fa-camera text-slate-400"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm font-bold text-emerald-400" id="label-photo">Jepret Foto / Pilih Foto</p>
+                            <p class="text-[10px] text-slate-400 mt-0.5">Wajib untuk laporan (Maks 2MB)</p>
+                        </div>
+                        <input type="file" accept="image/*" class="hidden" onchange="handleImageUpload(event, 'preview-photo', 'data-photo', 'label-photo')">
+                    </label>
+                    <input type="hidden" id="data-photo">
+                </div>
+
+                <button onclick="goToStep2()" class="w-full mt-4 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 px-4 rounded-xl transition shadow-lg shadow-emerald-600/30 active:scale-95 text-sm uppercase tracking-wider flex justify-center items-center gap-2">
+                    Masuk Kelas Teori <i class="fas fa-book-open"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- STEP 2: TEORI (BOOTCAMP) -->
+        <section id="step-2" class="hidden flex-col flex-1 page-enter w-full">
+            <div class="mb-4 text-center border-b border-slate-700 pb-4">
+                <span class="bg-cyan-500/20 text-cyan-300 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider mb-2 inline-block">Tahap 2 / 4</span>
+                <h3 class="text-xl font-black text-white leading-tight">Materi Tata Suara Dasar</h3>
+                <p class="text-[11px] text-slate-400 mt-1">Pahami teori fundamental <em>Wireless Mic (Saramonic Blink500)</em> di bawah ini sebelum memegang alat!</p>
+            </div>
+
+            <div class="space-y-4">
+                <!-- Panel 1: Anatomi -->
+                <div class="bg-slate-800/80 border border-slate-600 p-4 rounded-2xl">
+                    <h4 class="text-sm font-bold text-cyan-400 mb-2 border-b border-slate-700 pb-1 flex items-center gap-2"><i class="fas fa-microchip"></i> 1. Anatomi Saramonic B2+</h4>
+                    <p class="text-xs text-slate-300 leading-relaxed mb-2">Sistem *Wireless Mic* selalu terdiri dari dua bagian utama yang tidak boleh tertukar:</p>
+                    <ul class="text-[11px] text-slate-300 space-y-2">
+                        <li><strong class="text-white bg-blue-500/20 px-1 rounded">RX (Receiver) - Penerima:</strong> Dipasang di atas Kamera (Hot-shoe). Berfungsi menangkap sinyal suara.</li>
+                        <li><strong class="text-white bg-emerald-500/20 px-1 rounded">TX (Transmitter) - Pengirim:</strong> Dijepit di baju *Talent* (Narasumber/Host). Berfungsi sebagai *Microphone* yang mengirimkan suara ke RX.</li>
+                    </ul>
+                </div>
+
+                <!-- Panel 2: Kabel -->
+                <div class="bg-slate-800/80 border border-slate-600 p-4 rounded-2xl relative overflow-hidden">
+                    <div class="absolute right-[-10px] top-[-10px] opacity-10"><i class="fas fa-plug text-6xl"></i></div>
+                    <h4 class="text-sm font-bold text-amber-400 mb-2 border-b border-slate-700 pb-1 flex items-center gap-2 relative z-10"><i class="fas fa-project-diagram"></i> 2. Jebakan Kabel Audio</h4>
+                    <p class="text-xs text-slate-300 leading-relaxed mb-2 relative z-10">Kesalahan paling sering terjadi adalah salah colok kabel, menyebabkan suara tidak terekam sama sekali!</p>
+                    <div class="grid grid-cols-2 gap-2 relative z-10">
+                        <div class="bg-slate-900 p-2 rounded border border-slate-700">
+                            <p class="text-[10px] font-bold text-white mb-1 text-center border-b border-slate-700 pb-1">Kabel TRS</p>
+                            <p class="text-[9px] text-slate-400 text-center">Memiliki <strong class="text-amber-400">2 Garis Hitam</strong> di ujungnya. Khusus dicolok ke Kamera / Audio Recorder (Zoom).</p>
+                        </div>
+                        <div class="bg-slate-900 p-2 rounded border border-slate-700">
+                            <p class="text-[10px] font-bold text-white mb-1 text-center border-b border-slate-700 pb-1">Kabel TRRS</p>
+                            <p class="text-[9px] text-slate-400 text-center">Memiliki <strong class="text-amber-400">3 Garis Hitam</strong> di ujungnya. Khusus dicolok ke Handphone (Smartphone).</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel 3: Placement -->
+                <div class="bg-slate-800/80 border border-slate-600 p-4 rounded-2xl">
+                    <h4 class="text-sm font-bold text-purple-400 mb-2 border-b border-slate-700 pb-1 flex items-center gap-2"><i class="fas fa-user-tie"></i> 3. Posisi Jepit & Level Suara</h4>
+                    <ul class="text-[11px] text-slate-300 space-y-2">
+                        <li><strong class="text-white">Jarak Ideal (Placement):</strong> Jepit TX di kerah baju/dada sekitar <strong>15 - 20 cm (1 Jengkal)</strong> dari mulut *Talent*.</li>
+                        <li><strong class="text-white">Hindari Gesekan (Rustling):</strong> Pastikan *mic* tidak terhalang rambut tebal atau tertutup kalung/jaket yang bisa menghasilkan suara kresek-kresek saat *talent* bergerak.</li>
+                        <li><strong class="text-white">Audio Meter (-12dB):</strong> Pantau bar audio di layar kamera. Bar harus bergerak. Puncak suara (Peak) yang aman dan jernih berada di kisaran <strong>-12dB hingga -6dB</strong>. Jika menyentuh 0dB warna merah, suara akan *pecah/distorsi*.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <button onclick="goToStep3()" class="w-full mt-6 bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-4 rounded-xl transition shadow-lg active:scale-95 text-sm uppercase tracking-wider flex justify-center items-center gap-2">
+                Saya Paham, Mulai Praktik Fisik <i class="fas fa-arrow-right"></i>
+            </button>
+        </section>
+
+        <!-- STEP 3: PRAKTIK & SOP -->
+        <section id="step-3" class="hidden flex-col flex-1 page-enter w-full h-full">
+            <div class="mb-4 text-center border-b border-slate-700 pb-4">
+                <span class="bg-emerald-500/20 text-emerald-300 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider mb-2 inline-block">Tahap 3 / 4</span>
+                <h3 class="text-xl font-black text-white leading-tight">Misi Praktik: Talkshow</h3>
+                <p class="text-[11px] text-slate-400 mt-1">Lakukan pemasangan alat fisik secara nyata, centang SOP di bawah ini, lalu buat video Talkshow 1 Menit (2 Orang bicara).</p>
+            </div>
+
+            <div class="space-y-3 flex-1 overflow-y-auto mb-4 hide-scrollbar">
+                <!-- Checklist 1 -->
+                <div class="relative">
+                    <input type="checkbox" id="sop1" class="sop-checkbox hidden" onchange="checkSOP()">
+                    <label for="sop1" class="flex items-start gap-3 p-3 rounded-xl border border-slate-600 bg-slate-800/50 cursor-pointer transition">
+                        <div class="check-icon w-5 h-5 rounded border border-slate-500 flex items-center justify-center shrink-0 mt-0.5 transition"><i class="fas fa-check text-[10px] opacity-0 transition-opacity duration-200"></i></div>
+                        <div>
+                            <p class="text-xs font-bold text-white sop-text transition">Pasang RX (Receiver) ke Kamera</p>
+                            <p class="text-[9px] text-slate-400 mt-0.5">Letakkan di dudukan *hot-shoe* atas kamera dan kencangkan.</p>
+                        </div>
+                    </label>
+                </div>
+                <!-- Checklist 2 -->
+                <div class="relative">
+                    <input type="checkbox" id="sop2" class="sop-checkbox hidden" onchange="checkSOP()">
+                    <label for="sop2" class="flex items-start gap-3 p-3 rounded-xl border border-slate-600 bg-slate-800/50 cursor-pointer transition">
+                        <div class="check-icon w-5 h-5 rounded border border-slate-500 flex items-center justify-center shrink-0 mt-0.5 transition"><i class="fas fa-check text-[10px] opacity-0"></i></div>
+                        <div>
+                            <p class="text-xs font-bold text-white sop-text transition">Gunakan Kabel TRS (Kamera)</p>
+                            <p class="text-[9px] text-slate-400 mt-0.5">Colokkan kabel hitam bergaris 2 dari (RX OUT) ke lubang (MIC IN) di kamera.</p>
+                        </div>
+                    </label>
+                </div>
+                <!-- Checklist 3 -->
+                <div class="relative">
+                    <input type="checkbox" id="sop3" class="sop-checkbox hidden" onchange="checkSOP()">
+                    <label for="sop3" class="flex items-start gap-3 p-3 rounded-xl border border-slate-600 bg-slate-800/50 cursor-pointer transition">
+                        <div class="check-icon w-5 h-5 rounded border border-slate-500 flex items-center justify-center shrink-0 mt-0.5 transition"><i class="fas fa-check text-[10px] opacity-0"></i></div>
+                        <div>
+                            <p class="text-xs font-bold text-white sop-text transition">Nyalakan Alat (Power ON)</p>
+                            <p class="text-[9px] text-slate-400 mt-0.5">Nyalakan RX dan 2 buah TX. Pastikan lampu indikator menandakan mereka sudah terhubung (*pairing*).</p>
+                        </div>
+                    </label>
+                </div>
+                <!-- Checklist 4 -->
+                <div class="relative">
+                    <input type="checkbox" id="sop4" class="sop-checkbox hidden" onchange="checkSOP()">
+                    <label for="sop4" class="flex items-start gap-3 p-3 rounded-xl border border-slate-600 bg-slate-800/50 cursor-pointer transition">
+                        <div class="check-icon w-5 h-5 rounded border border-slate-500 flex items-center justify-center shrink-0 mt-0.5 transition"><i class="fas fa-check text-[10px] opacity-0"></i></div>
+                        <div>
+                            <p class="text-xs font-bold text-white sop-text transition">Jepit 2 Mic ke Talent</p>
+                            <p class="text-[9px] text-slate-400 mt-0.5">Jepit TX1 ke Host, TX2 ke Narasumber. Jarak 1 jengkal, hindari gesekan baju.</p>
+                        </div>
+                    </label>
+                </div>
+                <!-- Checklist 5 -->
+                <div class="relative">
+                    <input type="checkbox" id="sop5" class="sop-checkbox hidden" onchange="checkSOP()">
+                    <label for="sop5" class="flex items-start gap-3 p-3 rounded-xl border border-slate-600 bg-slate-800/50 cursor-pointer transition">
+                        <div class="check-icon w-5 h-5 rounded border border-slate-500 flex items-center justify-center shrink-0 mt-0.5 transition"><i class="fas fa-check text-[10px] opacity-0"></i></div>
+                        <div>
+                            <p class="text-xs font-bold text-white sop-text transition">Tes Suara (Cek Audio Meter -12dB)</p>
+                            <p class="text-[9px] text-slate-400 mt-0.5">Suruh *talent* berbicara. Pastikan bar hijau di kamera bergerak di area aman (-12dB) dan tidak pecah.</p>
+                        </div>
+                    </label>
+                </div>
+
+                <!-- Upload Bukti -->
+                <div class="mt-4 p-3 bg-slate-900 border border-slate-600 rounded-xl">
+                    <label class="block text-[10px] font-bold text-amber-300 mb-1.5 uppercase"><i class="fas fa-camera mr-1"></i> Foto Bukti Setup</label>
+                    <p class="text-[9px] text-slate-400 mb-2">Foto kamera yang menunjukkan RX terpasang ATAU foto layar kamera yang memperlihatkan grafik bar Audio sedang bergerak masuk.</p>
+                    <label class="flex items-center justify-center gap-2 bg-slate-800 border border-slate-600 py-3 rounded-lg cursor-pointer hover:bg-slate-700 transition">
+                        <i class="fas fa-upload text-sm text-white"></i>
+                        <span class="text-[11px] font-bold text-white" id="label-bukti">Ketuk untuk Ambil Foto Bukti</span>
+                        <input type="file" accept="image/*" class="hidden" onchange="handleImageUpload(event, 'preview-bukti', 'data-bukti', 'label-bukti')">
+                    </label>
+                    <input type="hidden" id="data-bukti">
+                    <div class="mt-2 hidden" id="preview-bukti-container">
+                        <img id="preview-bukti" class="w-full h-32 object-cover rounded border border-slate-600">
+                    </div>
+                </div>
+            </div>
+
+            <button id="btn-next-sop" onclick="goToStep4()" class="w-full bg-slate-700 text-slate-500 font-bold py-4 rounded-xl transition text-sm uppercase tracking-wider flex justify-center items-center gap-2 pointer-events-none mt-auto" disabled>
+                Lanjut Post-Test <i class="fas fa-lock"></i>
+            </button>
+        </section>
+
+        <!-- STEP 4: POST-TEST -->
+        <section id="step-4" class="hidden flex-col flex-1 page-enter w-full">
+            <div class="mb-4 text-center border-b border-slate-700 pb-4">
+                <span class="bg-purple-500/20 text-purple-300 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider mb-2 inline-block">Tahap 4 / 4</span>
+                <h3 class="text-xl font-black text-white leading-tight">Ujian Post-Test</h3>
+                <p class="text-[11px] text-slate-400 mt-1">Uji pemahaman teorimu. Jawab 5 pertanyaan berikut dengan tepat.</p>
+            </div>
+
+            <div class="space-y-4 mb-6" id="quiz-container">
+                <!-- Soal Kuis di render via JS -->
+            </div>
+
+            <button onclick="finishAll()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold py-4 rounded-xl shadow-lg shadow-teal-500/30 transition active:scale-95 text-sm uppercase tracking-wider flex justify-center items-center gap-2 mt-auto">
+                Kirim & Lihat Sertifikat <i class="fas fa-medal"></i>
+            </button>
+        </section>
+
+        <!-- STEP 5: HASIL (PDF READY) -->
+        <section id="step-5" class="hidden page-enter w-full pb-10">
+            <div id="pdf-content" class="shadow-2xl relative border border-slate-200 bg-white">
+                
+                <!-- HEADER LAPORAN -->
+                <div class="bg-slate-900 p-6 flex items-center justify-between border-b-4 border-emerald-500 print-only:flex">
+                    <img id="res-logo1" src="" class="w-14 h-14 bg-white rounded-full object-contain p-1 shrink-0 hidden border-2 border-slate-400">
+                    <div class="text-center px-4 flex-1">
+                        <h1 class="text-lg md:text-xl font-black uppercase tracking-widest text-white leading-none">SMKN 1 Tasikmalaya</h1>
+                        <h2 class="text-[10px] md:text-xs font-bold text-emerald-400 mt-1.5 uppercase tracking-widest">Program Keahlian Broadcasting & Film</h2>
+                        <p class="text-[9px] text-slate-400 mt-1">T.A 2026/2027</p>
+                    </div>
+                    <img id="res-logo2" src="" class="w-14 h-14 bg-black rounded-full object-cover shrink-0 hidden border-2 border-slate-600">
+                </div>
+
+                <div class="bg-slate-100 text-center py-3 border-b border-slate-200">
+                    <h3 class="text-sm font-black text-slate-800 uppercase tracking-wider">Sertifikat & Laporan Praktik</h3>
+                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Operasional Tata Suara (Saramonic B2+)</p>
+                </div>
+
+                <div class="p-6">
+                    <!-- INFO KRU & SKOR -->
+                    <div class="bg-white border border-slate-200 rounded-xl p-4 flex items-center gap-4 shadow-sm relative overflow-hidden mb-6">
+                        <img id="res-photo" src="" class="w-16 h-16 object-cover rounded-full border-2 border-slate-200 bg-slate-100 shrink-0 relative z-10 hidden">
+                        <div class="flex-1 relative z-10">
+                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Kru / Audio Person</p>
+                            <h3 class="text-lg font-black text-slate-900 leading-tight mt-0.5" id="res-name">Nama Siswa</h3>
+                            <p class="text-[10px] font-bold text-blue-700 bg-blue-50 inline-block px-2 py-0.5 rounded mt-1 border border-blue-100" id="res-class">Kelas</p>
+                        </div>
+                        <div class="text-center border-l border-slate-200 pl-4 relative z-10 flex flex-col items-center">
+                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Skor Kuis</p>
+                            <div class="w-12 h-12 rounded-full border-4 flex items-center justify-center text-lg font-black" id="res-score-circle">0</div>
+                        </div>
+                    </div>
+
+                    <!-- HASIL PRAKTIK / SOP -->
+                    <div class="mb-5">
+                        <h4 class="text-[11px] font-black text-slate-800 border-b-2 border-slate-800 pb-1 mb-3 uppercase tracking-wider">A. Verifikasi SOP Fisik</h4>
+                        <div class="grid grid-cols-2 gap-2 text-[10px] text-slate-700 font-semibold" id="res-sop-list">
+                            <!-- JS Inject -->
+                        </div>
+                    </div>
+
+                    <div class="mb-5">
+                        <h4 class="text-[11px] font-black text-slate-800 border-b-2 border-slate-800 pb-1 mb-3 uppercase tracking-wider">B. Bukti Visual Alat / Audio Meter</h4>
+                        <div class="w-full h-40 bg-slate-100 rounded-lg border border-slate-300 flex items-center justify-center overflow-hidden">
+                            <img id="res-bukti" src="" class="w-full h-full object-contain hidden">
+                        </div>
+                    </div>
+
+                    <!-- HASIL KUIS TEORI -->
+                    <div class="mb-5">
+                        <h4 class="text-[11px] font-black text-slate-800 border-b-2 border-slate-800 pb-1 mb-3 uppercase tracking-wider">C. Rekapitulasi Pemahaman Teori</h4>
+                        <div class="space-y-1.5" id="res-quiz-list">
+                            <!-- JS Inject -->
+                        </div>
+                    </div>
+
+                    <!-- PENGESAHAN -->
+                    <div class="mt-8 pt-4 flex justify-between items-end print-only:flex">
+                        <div class="text-center w-32">
+                            <p class="text-[9px] text-slate-500 mb-12">Mengetahui, Instruktur/Guru</p>
+                            <div class="border-b border-slate-800 pb-1"></div>
+                        </div>
+                        <div class="text-center w-32">
+                            <p class="text-[9px] text-slate-500 mb-12">Kru Audio,</p>
+                            <div class="border-b border-slate-800 pb-1">
+                                <p class="text-[10px] font-bold text-slate-800 truncate" id="res-ttd">-</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <p class="text-[8px] text-slate-400 text-center mt-6 print-only:block">Dicetak via Aplikasi Audio Bootcamp pada <span id="res-date" class="font-semibold"></span></p>
+                </div>
+            </div>
+
+            <!-- Tombol Aksi Bawah -->
+            <div class="mt-6 flex flex-col md:flex-row gap-3 no-print w-full">
+                <button onclick="exportToPDF()" id="btn-export" class="flex-[2] py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg transition text-sm flex items-center justify-center gap-2 active:scale-95">
+                    <i class="fas fa-file-pdf"></i> Bagikan / Simpan PDF
+                </button>
+                <button onclick="location.reload()" class="flex-1 py-4 bg-slate-200 text-slate-700 font-bold rounded-xl text-sm transition active:scale-95">
+                    Selesai
+                </button>
+            </div>
+            
+            <!-- FALLBACK CETAK SISTEM -->
+            <div id="download-warning" class="hidden mt-2 p-4 bg-red-50 border border-red-200 rounded-xl text-center no-print mb-8 shadow-sm">
+                <p class="text-xs text-red-600 font-bold mb-1 flex items-center justify-center gap-1"><i class="fas fa-exclamation-triangle"></i> Menu Berbagi Terblokir?</p>
+                <p class="text-[10px] text-slate-600 mb-3 leading-relaxed">Sistem HP Anda memblokir unduhan. Gunakan tombol di bawah lalu ubah pilihan Printer menjadi <strong class="text-slate-800">"Simpan sebagai PDF"</strong>.</p>
+                <button onclick="window.print()" class="w-full py-3 bg-slate-800 text-white font-bold rounded-xl text-xs shadow-lg active:scale-95 transition flex items-center justify-center gap-2">
+                    <i class="fas fa-print"></i> Gunakan Cetak Sistem (Print PDF)
+                </button>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- TOAST ALERT -->
+    <div id="toast" class="fixed top-5 left-1/2 transform -translate-x-1/2 -translate-y-[150%] bg-slate-900 border border-slate-700 text-white px-5 py-3 rounded-full shadow-2xl transition-all duration-300 z-[100] flex items-center gap-3 w-max max-w-[90vw] opacity-0 pointer-events-none">
+        <i id="toast-icon" class="fas fa-info-circle text-emerald-400"></i>
+        <p class="text-xs font-bold whitespace-normal" id="toast-msg">Pesan</p>
+    </div>
+
+    <!-- STYLE INJECTION UNTUK EFEK RADIO -->
+    <style>
+        .sop-checkbox + label .check-icon i { transition: opacity 0.2s; }
+        .sop-checkbox:checked + label .check-icon i { opacity: 1; }
+    </style>
+
+    <script>
+        // --- DATA & STATE ---
+        let studentData = { name: "", class: "", photo: "", logo1: "", logo2: "", bukti: "" };
+        const totalSOP = 5;
+
+        // Data Kuis Teori
+        const quizData = [
+            { q: "Pada sistem mikrofon wireless Saramonic, unit manakah yang harus dijepitkan di baju narasumber (sebagai mic)?", opts: ["A. RX (Receiver)", "B. TX (Transmitter)", "C. Kamera", "D. Handphone"], ans: 1 },
+            { q: "Kamu menggunakan Kamera Video profesional, jenis kabel audio apa yang wajib digunakan untuk menyambungkan Saramonic ke Kamera?", opts: ["A. TRRS (3 Garis Hitam)", "B. Kabel USB Type-C", "C. TRS (2 Garis Hitam)", "D. Kabel HDMI"], ans: 2 },
+            { q: "Berapa jarak ideal saat menjepitkan Clip-on/Lavalier (TX) ke baju talent?", opts: ["A. Sedekat mungkin menempel dengan bibir.", "B. Di perut atau sabuk celana.", "C. Sekitar 1 jengkal (15-20cm) di area tulang dada.", "D. Di belakang kerah leher."], ans: 2 },
+            { q: "Untuk menghindari suara 'Rustling' (suara gesekan kresek-kresek) yang terekam, apa yang harus diperhatikan saat memasang mic?", opts: ["A. Mematikan phantom power kamera.", "B. Memastikan badan mic tidak tertutup/bergesekan dengan kain baju atau rambut tebal.", "C. Mengganti baterai Saramonic dengan yang baru.", "D. Membungkus mic dengan plastik."], ans: 1 },
+            { q: "Berapa standar angka level 'Peak' Audio Meter di kamera yang paling aman (suara kencang tapi tidak pecah)?", opts: ["A. Di atas 0 dB (Warna Merah).", "B. Di area -12dB hingga -6dB.", "C. Di bawah -30dB.", "D. Harus tepat di -20dB."], ans: 1 }
+        ];
+        let quizAnswers = new Array(quizData.length).fill(null);
+
+        // --- UTILITIES ---
+        function showToast(msg, type = 'info') {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            const icon = document.getElementById('toast-icon');
+            
+            if(type === 'error') { icon.className = "fas fa-exclamation-circle text-red-500"; } 
+            else { icon.className = "fas fa-check-circle text-emerald-400"; }
+            
+            toast.classList.remove('-translate-y-[150%]', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('-translate-y-[150%]', 'opacity-0');
+            }, 3000);
+        }
+
+        // Image to Base64
+        function handleImageUpload(event, previewId, dataId, labelId) {
+            const file = event.target.files[0];
+            if (file) {
+                if(file.size > 2 * 1024 * 1024) return showToast("Maksimal ukuran foto 2MB!", 'error');
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    document.getElementById(dataId).value = e.target.result;
+                    document.getElementById(previewId).src = e.target.result;
+                    document.getElementById(previewId).classList.remove('hidden');
+                    
+                    if(previewId === 'preview-bukti') {
+                        document.getElementById('preview-bukti-container').classList.remove('hidden');
+                        checkSOP(); // trigger progress update
+                    }
+
+                    const labelBtn = document.getElementById(labelId);
+                    labelBtn.innerText = "Tersimpan";
+                    if(labelId === 'label-photo' || labelId.includes('logo')) {
+                        labelBtn.classList.replace('text-emerald-400', 'text-cyan-400');
+                        labelBtn.classList.replace('text-slate-400', 'text-cyan-400');
+                    } else {
+                        labelBtn.classList.replace('text-white', 'text-emerald-400');
+                    }
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // --- NAVIGATION ---
+        function goToStep2() {
+            studentData.name = document.getElementById('input-name').value.trim();
+            studentData.class = document.getElementById('input-class').value;
+            studentData.photo = document.getElementById('data-photo').value;
+            studentData.logo1 = document.getElementById('data-logo1').value;
+            studentData.logo2 = document.getElementById('data-logo2').value;
+
+            if (!studentData.name || !studentData.class || !studentData.photo || !studentData.logo1 || !studentData.logo2) {
+                return showToast("Mohon lengkapi Nama, Kelas, & unggah ke-3 Gambar!", 'error');
+            }
+
+            document.getElementById('step-1').classList.add('hidden');
+            document.getElementById('step-2').classList.remove('hidden');
+            document.getElementById('step-2').classList.add('flex');
+            window.scrollTo(0, 0);
+        }
+
+        function goToStep3() {
+            document.getElementById('step-2').classList.replace('flex', 'hidden');
+            document.getElementById('step-3').classList.remove('hidden');
+            document.getElementById('step-3').classList.add('flex');
+            window.scrollTo(0, 0);
+        }
+
+        // --- SOP LOGIC ---
+        function checkSOP() {
+            const checkedBoxes = document.querySelectorAll('.sop-checkbox:checked').length;
+            const buktiImg = document.getElementById('data-bukti').value;
+            const btnNext = document.getElementById('btn-next-sop');
+
+            if (checkedBoxes === totalSOP && buktiImg) {
+                btnNext.disabled = false;
+                btnNext.className = "w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-4 rounded-xl transition shadow-lg active:scale-95 text-sm uppercase tracking-wider flex justify-center items-center gap-2 mt-auto";
+                btnNext.innerHTML = 'Lanjut Post-Test <i class="fas fa-arrow-right"></i>';
+            } else {
+                btnNext.disabled = true;
+                btnNext.className = "w-full bg-slate-700 text-slate-500 font-bold py-4 rounded-xl transition text-sm uppercase tracking-wider flex justify-center items-center gap-2 pointer-events-none mt-auto";
+                btnNext.innerHTML = 'Lanjut Post-Test <i class="fas fa-lock"></i>';
+            }
+        }
+        
+        // Workaround for hidden input change
+        const observer = new MutationObserver(checkSOP);
+        observer.observe(document.getElementById('data-bukti'), { attributes: true });
+
+        // --- NAVIGATION TO QUIZ ---
+        function goToStep4() {
+            renderQuiz();
+            document.getElementById('step-3').classList.replace('flex', 'hidden');
+            document.getElementById('step-4').classList.remove('hidden');
+            document.getElementById('step-4').classList.add('flex');
+            window.scrollTo(0, 0);
+        }
+
+        function renderQuiz() {
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = "";
+            quizData.forEach((q, qIndex) => {
+                let optsHTML = "";
+                q.opts.forEach((opt, oIndex) => {
+                    optsHTML += `
+                        <div class="relative mt-2">
+                            <input type="radio" name="q${qIndex}" id="q${qIndex}_${oIndex}" value="${oIndex}" class="quiz-radio hidden" onchange="quizAnswers[${qIndex}] = ${oIndex}">
+                            <label for="q${qIndex}_${oIndex}" class="flex items-start gap-3 p-3 border border-slate-600 rounded-xl cursor-pointer bg-slate-800/50 transition">
+                                <div class="indicator w-4 h-4 rounded-full border border-slate-400 shrink-0 mt-0.5 flex items-center justify-center transition"><div class="w-1.5 h-1.5 rounded-full bg-white"></div></div>
+                                <span class="text-[11px] font-semibold text-slate-300">${opt}</span>
+                            </label>
+                        </div>
+                    `;
+                });
+                container.innerHTML += `<div class="glass-panel p-4 rounded-2xl"><p class="text-xs font-bold text-white leading-snug"><span class="text-purple-400">${qIndex+1}.</span> ${q.q}</p>${optsHTML}</div>`;
+            });
+        }
+
+        // --- EVALUASI & PDF RENDER ---
+        function finishAll() {
+            if (quizAnswers.includes(null)) return showToast("Jawab semua pertanyaan teori terlebih dahulu!", "error");
+
+            // Build PDF Identitas & Gambar
+            document.getElementById('res-name').innerText = studentData.name;
+            document.getElementById('res-ttd').innerText = studentData.name;
+            document.getElementById('res-class').innerText = studentData.class;
+            
+            document.getElementById('res-photo').src = studentData.photo;
+            document.getElementById('res-photo').classList.remove('hidden');
+            
+            document.getElementById('res-logo1').src = studentData.logo1;
+            document.getElementById('res-logo1').classList.remove('hidden');
+            document.getElementById('res-logo2').src = studentData.logo2;
+            document.getElementById('res-logo2').classList.remove('hidden');
+
+            document.getElementById('res-bukti').src = document.getElementById('data-bukti').value;
+            document.getElementById('res-bukti').classList.remove('hidden');
+
+            // Build SOP List
+            const sopTitles = ["Pasang RX Kamera", "Kabel TRS", "Power & Pairing", "Jepit TX (1 Jengkal)", "Audio Meter -12dB"];
+            let sopHTML = "";
+            sopTitles.forEach(t => { sopHTML += `<div class="flex items-center gap-1.5"><i class="fas fa-check-circle text-emerald-500"></i> ${t}</div>`; });
+            document.getElementById('res-sop-list').innerHTML = sopHTML;
+
+            // Hitung Kuis
+            let score = 0;
+            let reportQuizHTML = "";
+            quizData.forEach((q, idx) => {
+                const isCorrect = quizAnswers[idx] === q.ans;
+                if(isCorrect) score += 20; // 5 soal x 20 = 100
+                
+                reportQuizHTML += `
+                    <div class="bg-slate-50 border ${isCorrect ? 'border-emerald-200' : 'border-red-200'} p-2 rounded-lg flex justify-between items-center gap-2">
+                        <p class="text-[9px] font-medium text-slate-700 truncate flex-1">${idx+1}. ${q.q}</p>
+                        <span class="text-[8px] font-black px-1.5 py-0.5 rounded uppercase ${isCorrect ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}">${isCorrect ? 'Benar' : 'Salah'}</span>
+                    </div>
+                `;
+            });
+
+            // Update UI Score
+            const circle = document.getElementById('res-score-circle');
+            circle.innerText = score;
+            if(score >= 80) circle.className = "w-12 h-12 rounded-full border-4 flex items-center justify-center text-lg font-black border-emerald-200 bg-emerald-100 text-emerald-700";
+            else if(score >= 60) circle.className = "w-12 h-12 rounded-full border-4 flex items-center justify-center text-lg font-black border-amber-200 bg-amber-100 text-amber-700";
+            else circle.className = "w-12 h-12 rounded-full border-4 flex items-center justify-center text-lg font-black border-red-200 bg-red-100 text-red-700";
+            
+            document.getElementById('res-quiz-list').innerHTML = reportQuizHTML;
+
+            const dt = new Date();
+            document.getElementById('res-date').innerText = dt.toLocaleDateString('id-ID', {day: 'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit'});
+
+            // Switch Screen
+            document.getElementById('main-header').classList.add('hidden');
+            document.getElementById('step-4').classList.replace('flex', 'hidden');
+            document.body.style.background = "white"; 
+            document.getElementById('step-5').classList.remove('hidden');
+            window.scrollTo(0, 0);
+        }
+
+        // --- PDF EXPORT (WEB SHARE API + FALLBACK) ---
+        function exportToPDF() {
+            showToast("Sedang memproses PDF...");
+            window.scrollTo(0,0); 
+            
+            const btn = document.getElementById('btn-export');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Memproses...`;
+            btn.disabled = true;
+
+            const element = document.getElementById('pdf-content');
+            const fileName = `Sertifikat_Audio_${studentData.class.replace(/\s/g,'')}_${studentData.name.replace(/\s+/g, '')}.pdf`;
+            
+            const opt = {
+                margin:       0,
+                filename:     fileName,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
+                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).outputPdf('blob').then(function(pdfBlob) {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+
+                const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
+
+                if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+                    navigator.share({
+                        files: [pdfFile],
+                        title: 'Sertifikat Kalibrasi Audio',
+                        text: 'Berikut adalah hasil laporan Sertifikat Kalibrasi Audio BDF.'
+                    }).then(() => {
+                        showToast("Berhasil memanggil menu Share!");
+                    }).catch((error) => {
+                        document.getElementById('download-warning').classList.remove('hidden');
+                        window.scrollTo(0, document.body.scrollHeight);
+                    });
+                } else {
+                    try {
+                        const blobUrl = URL.createObjectURL(pdfBlob);
+                        const link = document.createElement('a');
+                        link.href = blobUrl;
+                        link.download = fileName;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
+                    } catch (e) {
+                        console.error(e);
+                    }
+                    document.getElementById('download-warning').classList.remove('hidden');
+                    window.scrollTo(0, document.body.scrollHeight);
+                }
+            }).catch(err => {
+                showToast("Gagal memproses PDF.", 'error');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            });
+        }
+    </script>
+</body>
+</html>
