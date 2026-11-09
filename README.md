@@ -8,4 +8,5 @@ Editing Dasar 1 : https://sadrambdf.github.io/bdf/editing_dasar.html
 Editing Dasar 2 : https://sadrambdf.github.io/bdf/editing_audio_video_film.html  
 Mengenal Kamera Video : https://sadrambdf.github.io/bdf/kamera_video.html  
 Produksi Film - Shot List : https://sadrambdf.github.io/bdf/DigitalShotlist.html  
-Produksi Film - Timeline : https://sadrambdf.github.io/bdf/logbook_digital_timeline_company_profile_v1.5.html
+Produksi Film - Timeline : https://sadrambdf.github.io/bdf/logbook_digital_timeline_company_profile_v1.5.html  
+DDPK - Peralatan Audio Video : https://sadrambdf.github.io/bdf/tata_suara_dasar.html
