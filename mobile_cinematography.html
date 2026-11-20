@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mobile Cinema Lab - LKPD Proyek BDF</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- html2pdf.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #090d16;
+            background-image:
+                radial-gradient(at 0% 0%, hsla(199, 89%, 20%, 0.45) 0, transparent 50%),
+                radial-gradient(at 100% 100%, hsla(262, 60%, 22%, 0.45) 0, transparent 50%);
+            background-attachment: fixed;
+            color: #f8fafc;
+            -webkit-tap-highlight-color: transparent;
+            min-height: 100vh;
+        }
+
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.78);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.35);
+        }
+
+        .page-enter {
+            animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(14px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Custom Checkbox Teknik */
+        .tech-checkbox:checked + label {
+            background-color: rgba(14, 165, 233, 0.18);
+            border-color: #38bdf8;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.25);
+        }
+        .tech-checkbox:checked + label .check-badge {
+            background-color: #0ea5e9;
+            border-color: #0ea5e9;
+            color: #ffffff;
+        }
+        .tech-checkbox:checked + label .check-badge i {
+            opacity: 1;
+        }
+
+        /* Custom Checkbox Editing Checklist */
+        .edit-checkbox:checked + label {
+            background-color: rgba(16, 185, 129, 0.15);
+            border-color: #10b981;
+        }
+        .edit-checkbox:checked + label .edit-icon {
+            background-color: #10b981;
+            border-color: #10b981;
+            color: #ffffff;
+        }
+        .edit-checkbox:checked + label .edit-icon i {
+            opacity: 1;
+        }
+
+        /* Scrollbar halus */
+        textarea::-webkit-scrollbar { width: 5px; }
+        textarea::-webkit-scrollbar-track { background: transparent; }
+        textarea::-webkit-scrollbar-thumb { background: #334155; border-radius: 8px; }
+
+        /* Pengaturan Print & PDF */
+        @media print {
+            body { background: white !important; color: black !important; padding: 0 !important; }
+            #app-container { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
+            .no-print { display: none !important; }
+            #pdf-content { box-shadow: none !important; border: none !important; border-radius: 0 !important; }
+        }
+        #pdf-content { background-color: #ffffff; color: #0f172a; border-radius: 14px; }
+        .print-only { display: none; }
+        .html2pdf__container .no-print { display: none !important; }
+        .html2pdf__container .print-only { display: block !important; }
+    </style>
+</head>
+<body class="pb-24 pt-4 md:pt-8 px-4 flex flex-col items-center">
+
+    <div class="max-w-xl mx-auto w-full relative z-10 flex flex-col min-h-[90vh]" id="app-container">
+
+        <!-- HEADER UTAMA -->
+        <header id="main-header" class="text-center mb-5 page-enter">
+            <div class="inline-flex items-center justify-center gap-2 mb-2 bg-slate-800/80 px-3 py-1 rounded-full border border-slate-700">
+                <span class="w-2 h-2 rounded-full bg-sky-400 animate-pulse"></span>
+                <span class="text-[10px] font-bold text-slate-300 tracking-widest uppercase">SMKN 1 Tasikmalaya • BDF / PF</span>
+            </div>
+            <h1 class="text-2xl md:text-3xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-cyan-300 to-indigo-400 uppercase leading-tight">
+                Mobile Cinema Lab
+            </h1>
+            <p class="text-xs font-semibold text-slate-400 mt-1 uppercase tracking-widest">LKPD Proyek Video Sinematik Handphone</p>
+
+            <!-- Indikator Progres Langkah -->
+            <div class="mt-4 flex items-center justify-center gap-1.5" id="step-indicator">
+                <span id="dot-1" class="h-1.5 w-8 rounded-full bg-sky-500 transition-all"></span>
+                <span id="dot-2" class="h-1.5 w-4 rounded-full bg-slate-700 transition-all"></span>
+                <span id="dot-3" class="h-1.5 w-4 rounded-full bg-slate-700 transition-all"></span>
+                <span id="dot-4" class="h-1.5 w-4 rounded-full bg-slate-700 transition-all"></span>
+                <span id="dot-5" class="h-1.5 w-4 rounded-full bg-slate-700 transition-all"></span>
+            </div>
+        </header>
+
+        <!-- ==================== TAHAP 1: IDENTITAS ==================== -->
+        <section id="step-1" class="glass-panel p-5 md:p-6 rounded-3xl page-enter flex-1">
+            <div class="mb-5 border-b border-slate-700/80 pb-4">
+                <span class="bg-sky-500/20 text-sky-300 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">Tahap 1 / 5</span>
+                <h2 class="text-xl font-bold text-white mt-2">Identitas Filmmaker</h2>
+                <p class="text-xs text-slate-400 mt-1">Isi data diri atau kelompok serta unggah atribut untuk lembar laporan proyek.</p>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-300 mb-1.5 uppercase tracking-wide">Nama Siswa / Kelompok</label>
+                    <input type="text" id="input-name" class="w-full bg-slate-900/70 border border-slate-600 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:border-sky-500 outline-none transition" placeholder="Contoh: Raka Pratama atau Kelompok 2 (Raka, Dinda)">
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-300 mb-1.5 uppercase tracking-wide">Kelas</label>
+                    <div class="relative">
+                        <select id="input-class" class="w-full bg-slate-900/70 border border-slate-600 rounded-xl px-4 py-3 text-sm text-white focus:border-sky-500 outline-none transition appearance-none">
+                            <option value="" disabled selected>-- Pilih Kelas --</option>
+                            <option value="X-BDF 1">X-BDF 1</option>
+                            <option value="X-BDF 2">X-BDF 2</option>
+                            <option value="XI-PF 1">XI-PF 1</option>
+                            <option value="XI-PF 2">XI-PF 2</option>
+                            <option value="XII-PF 1">XII-PF 1</option>
+                            <option value="XII-PF 2">XII-PF 2</option>
+                        </select>
+                        <i class="fas fa-chevron-down text-slate-400 text-xs absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-300 mb-1.5 uppercase tracking-wide">Tipe Handphone yang Digunakan</label>
+                    <input type="text" id="input-device" class="w-full bg-slate-900/70 border border-slate-600 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:border-sky-500 outline-none transition" placeholder="Contoh: Samsung A54 / iPhone 11 / Redmi Note 12">
+                </div>
+
+                <!-- Upload Logo Sekolah & Jurusan -->
+                <div class="grid grid-cols-2 gap-3 pt-1">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 mb-1.5 uppercase text-center">Logo SMKN 1</label>
+                        <label class="flex flex-col items-center justify-center bg-slate-800/80 border border-slate-600 border-dashed h-24 rounded-xl cursor-pointer hover:bg-slate-700/80 transition relative overflow-hidden">
+                            <img id="preview-logo1" class="absolute inset-0 w-full h-full object-contain p-2 hidden z-10 bg-white">
+                            <i class="fas fa-university text-slate-500 text-xl mb-1"></i>
+                            <span class="text-[9px] text-slate-400 font-semibold" id="label-logo1">Unggah Logo</span>
+                            <input type="file" accept="image/*" class="hidden" onchange="handleImageUpload(event, 'preview-logo1', 'data-logo1', 'label-logo1')">
+                        </label>
+                        <input type="hidden" id="data-logo1">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 mb-1.5 uppercase text-center">Logo Jurusan BDF/PF</label>
+                        <label class="flex flex-col items-center justify-center bg-slate-800/80 border border-slate-600 border-dashed h-24 rounded-xl cursor-pointer hover:bg-slate-700/80 transition relative overflow-hidden">
+                            <img id="preview-logo2" class="absolute inset-0 w-full h-full object-cover hidden z-10 bg-black">
+                            <i class="fas fa-film text-slate-500 text-xl mb-1"></i>
+                            <span class="text-[9px] text-slate-400 font-semibold" id="label-logo2">Unggah Logo</span>
+                            <input type="file" accept="image/*" class="hidden" onchange="handleImageUpload(event, 'preview-logo2', 'data-logo2', 'label-logo2')">
+                        </label>
+                        <input type="hidden" id="data-logo2">
+                    </div>
+                </div>
+
+                <!-- Upload Foto Profil -->
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-300 mb-1.5 uppercase tracking-wide">Foto Profil Siswa / Tim</label>
+                    <label class="flex items-center gap-4 bg-slate-900/60 border border-slate-600 border-dashed p-3 rounded-xl cursor-pointer hover:bg-slate-800/80 transition">
+                        <div class="w-14 h-14 rounded-full bg-slate-800 flex items-center justify-center overflow-hidden shrink-0 relative border border-slate-600">
+                            <img id="preview-photo" class="absolute inset-0 w-full h-full object-cover hidden z-10">
+                            <i class="fas fa-camera text-slate-400"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm font-bold text-sky-400" id="label-photo">Pilih / Jepret Foto</p>
+                            <p class="text-[10px] text-slate-400 mt-0.5">Wajib untuk identitas PDF (Maks 2MB)</p>
+                        </div>
+                        <input type="file" accept="image/*" class="hidden" onchange="handleImageUpload(event, 'preview-photo', 'data-photo', 'label-photo')">
+                    </label>
+                    <input type="hidden" id="data-photo">
+                </div>
+
+                <button onclick="goToStep(2)" class="w-full mt-2 bg-sky-600 hover:bg-sky-500 text-white font-bold py-4 rounded-xl transition shadow-lg shadow-sky-600/25 active:scale-95 text-sm uppercase tracking-wider flex justify-center items-center gap-2">
+                    Pelajari Materi Singkat <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- ==================== TAHAP 2: MATERI SINGKAT ==================== -->
+        <section id="step-2" class="hidden flex-col flex-1 page-enter w-full">
+            <div class="glass-panel p-5 md:p-6 rounded-3xl">
+                <div class="mb-5 border-b border-slate-700/80 pb-4">
+                    <span class="bg-cyan-500/20 text-cyan-300 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">Tahap 2 / 5</span>
+                    <h2 class="text-xl font-black text-white mt-2">Materi: Bikin HP Rasa Kamera Pro</h2>
+                    <p class="text-xs text-slate-400 mt-1">Kunci video sinematik bukan pada harga kameranya, melainkan pada cara kita mengontrol cahaya, gerak, dan pengaturan HP.</p>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- Kartu Materi 1 -->
+                    <div class="bg-slate-800/70 border border-slate-700 p-4 rounded-2xl border-l-4 border-l-sky-400">
+                        <h3 class="text-sm font-extrabold text-sky-300 mb-2 flex items-center gap-2">
+                            <i class="fas fa-sliders-h"></i> 1. Kunci Pengaturan Kamera (Pro / Manual)
+                        </h3>
+                        <ul class="text-xs text-slate-300 space-y-2 leading-relaxed">
+                            <li><strong class="text-white">AE/AF Lock (Wajib!):</strong> Tekan dan tahan layar pada objek utama hingga muncul ikon gembok kuning/biru. Ini mencegah cahaya dan fokus "kedip-kedip" sendiri saat merekam.</li>
+                            <li><strong class="text-white">Resolusi & Frame Rate:</strong> Gunakan <strong>1080p atau 4K</strong>. Pilih <strong>24fps / 30fps</strong> untuk kesan film normal, atau <strong>60fps</strong> khusus jika adegan ingin dibuat <em>slow-motion</em> saat editing.</li>
+                            <li><strong class="text-white">Aturan 180 Derajat (Mode Pro):</strong> Jika HP memiliki Mode Pro Video, atur <em>Shutter Speed</em> = 2x FPS (misal 30fps → Shutter 1/60) agar gerakan terlihat natural (*motion blur* sinematik).</li>
+                        </ul>
+                    </div>
+
+                    <!-- Kartu Materi 2 -->
+                    <div class="bg-slate-800/70 border border-slate-700 p-4 rounded-2xl border-l-4 border-l-emerald-400">
+                        <h3 class="text-sm font-extrabold text-emerald-300 mb-2 flex items-center gap-2">
+                            <i class="fas fa-walking"></i> 2. Stabilisasi & Gerakan Kamera
+                        </h3>
+                        <ul class="text-xs text-slate-300 space-y-2 leading-relaxed">
+                            <li><strong class="text-white">Teknik Ninja Walk:</strong> Pegang HP dengan 2 tangan, rapatkan siku ke rusuk, tekuk lutut sedikit, dan melangkah perlahan dari tumit ke ujung kaki agar gambar tidak berguncang.</li>
+                            <li><strong class="text-white">Hindari Digital Zoom:</strong> Jangan mencubit layar untuk *zoom* karena gambar akan pecah. Lebih baik melangkah maju mendekati objek (*Push-in*) atau mundur (*Pull-out*).</li>
+                            <li><strong class="text-white">Gerakan Sinematik:</strong> Latih gerakan <em>Reveal Shot</em> (keluar dari balik dinding/daun), <em>Parallax/Orbit</em> (mengitari objek), dan <em>Low Angle</em> (membalik HP agar lensa dekat lantai).</li>
+                        </ul>
+                    </div>
+
+                    <!-- Kartu Materi 3 -->
+                    <div class="bg-slate-800/70 border border-slate-700 p-4 rounded-2xl border-l-4 border-l-amber-400">
+                        <h3 class="text-sm font-extrabold text-amber-300 mb-2 flex items-center gap-2">
+                            <i class="fas fa-sun"></i> 3. Cahaya, Komposisi & Lensa
+                        </h3>
+                        <ul class="text-xs text-slate-300 space-y-2 leading-relaxed">
+                            <li><strong class="text-white">Lap Lensa HP!</strong> Kebiasaan sepele tapi fatal: lensa HP sering berminyak kena jari, membuat cahaya tampak berkabut/buram. Selalu lap sebelum merekam.</li>
+                            <li><strong class="text-white">Aktifkan Grid (Rule of Thirds):</strong> Letakkan objek di titik perpotongan garis agar komposisi enak dilihat dan horizon tidak miring.</li>
+                            <li><strong class="text-white">Manfaatkan Foreground & Natural Light:</strong> Rekam di dekat jendela atau saat <em>Golden Hour</em> (pagi/sore). Tempatkan benda dekat lensa (daun/bingkai pintu) sebagai *foreground* untuk menciptakan efek dimensi 3D.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 mt-6">
+                    <button onclick="goToStep(1, true)" class="px-4 py-3.5 bg-slate-800 border border-slate-600 text-slate-300 font-bold rounded-xl text-xs hover:bg-slate-700 transition">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <button onclick="goToStep(3)" class="flex-1 bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3.5 rounded-xl transition shadow-lg active:scale-95 text-sm uppercase tracking-wider flex justify-center items-center gap-2">
+                        Lanjut Riset YouTube <i class="fab fa-youtube text-base"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAHAP 3: RISET YOUTUBE & PILIH TEKNIK ==================== -->
+        <section id="step-3" class="hidden flex-col flex-1 page-enter w-full">
+            <div class="glass-panel p-5 md:p-6 rounded-3xl space-y-5">
+                <div class="border-b border-slate-700/80 pb-4">
+                    <span class="bg-red-500/20 text-red-300 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">Tahap 3 / 5</span>
+                    <h2 class="text-xl font-black text-white mt-2">Riset Tutorial & Pilih Teknik</h2>
+                    <p class="text-xs text-slate-400 mt-1">Tonton tutorial pengambilan gambar HP di YouTube, lampirkan linknya, lalu catat teknik yang akan kamu tiru.</p>
+                </div>
+
+                <!-- Box Rujukan Channel YouTube -->
+                <div class="bg-gradient-to-r from-red-950/70 to-slate-900 border border-red-500/40 p-4 rounded-2xl">
+                    <div class="flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-11 h-11 rounded-xl bg-red-600 flex items-center justify-center shrink-0 shadow-lg shadow-red-600/30">
+                                <i class="fab fa-youtube text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-bold text-red-300 uppercase tracking-wider">Channel Rekomendasi Guru</p>
+                                <h3 class="text-sm font-black text-white">Learn Online Video</h3>
+                                <p class="text-[10px] text-slate-400">youtube.com/@LearnOnlineVideo</p>
+                            </div>
+                        </div>
+                        <a href="https://www.youtube.com/@LearnOnlineVideo" target="_blank" rel="noopener noreferrer" class="px-3.5 py-2 bg-red-600 hover:bg-red-500 text-white text-xs font-bold rounded-xl shadow transition shrink-0 flex items-center gap-1.5">
+                            Buka <i class="fas fa-external-link-alt text-[10px]"></i>
+                        </a>
+                    </div>
+                    <p class="text-[10px] text-slate-300 mt-3 leading-relaxed border-t border-red-500/20 pt-2">
+                        <i class="fas fa-info-circle text-red-400 mr-1"></i> Kamu boleh mencari video tutorial dari channel <strong>@LearnOnlineVideo</strong> atau channel YouTube lainnya, asalkan melampirkan tautan (link) videonya di bawah ini.
+                    </p>
+                </div>
+
+                <!-- Input Link Referensi -->
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-300 mb-1.5 uppercase tracking-wide">Link Video YouTube Utama (Wajib)</label>
+                        <input type="url" id="input-yt-1" class="w-full bg-slate-900/70 border border-slate-600 rounded-xl px-4 py-3 text-xs text-white placeholder-slate-500 focus:border-red-500 outline-none transition" placeholder="Paste link video YouTube yang kamu tonton (https://youtu.be/...)">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-400 mb-1.5 uppercase tracking-wide">Link Video Tambahan (Opsional)</label>
+                        <input type="url" id="input-yt-2" class="w-full bg-slate-900/70 border border-slate-700 rounded-xl px-4 py-3 text-xs text-white placeholder-slate-500 focus:border-sky-500 outline-none transition" placeholder="Paste link referensi ke-2 jika ada...">
+                    </div>
+                </div>
+
+                <!-- Pilihan Teknik (Checklist Interaktif) -->
+                <div>
+                    <label class="block text-[11px] font-bold text-sky-300 mb-2 uppercase tracking-wide">Pilih Teknik yang Akan Diterapkan (Min. 3)</label>
+                    <div class="grid grid-cols-2 gap-2" id="tech-grid">
+                        <!-- Rendered via JS -->
+                    </div>
+                </div>
+
+                <!-- Catatan Hasil Analisa -->
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-300 mb-1.5 uppercase tracking-wide">Catatan Hasil Analisa Teknik</label>
+                    <textarea id="input-tech-notes" rows="4" class="w-full bg-slate-900/70 border border-slate-600 rounded-xl px-4 py-3 text-xs text-white placeholder-slate-500 focus:border-sky-500 outline-none transition" placeholder="Jelaskan singkat cara kerja teknik yang kamu pilih dari video tutorial tersebut agar tidak lupa saat syuting..."></textarea>
+                </div>
+
+                <div class="flex gap-3 pt-2">
+                    <button onclick="goToStep(2, true)" class="px-4 py-3.5 bg-slate-800 border border-slate-600 text-slate-300 font-bold rounded-xl text-xs hover:bg-slate-700 transition">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <button onclick="goToStep(4)" class="flex-1 bg-sky-600 hover:bg-sky-500 text-white font-bold py-3.5 rounded-xl transition shadow-lg active:scale-95 text-sm uppercase tracking-wider flex justify-center items-center gap-2">
+                        Rancang Alur Cerita <i class="fas fa-clapperboard"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAHAP 4: ALUR CERITA & PENERAPAN ==================== -->
+        <section id="step-4" class="hidden flex-col flex-1 page-enter w-full">
+            <div class="glass-panel p-5 md:p-6 rounded-3xl space-y-5">
+                <div class="border-b border-slate-700/80 pb-4">
+                    <span class="bg-amber-500/20 text-amber-300 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">Tahap 4 / 5</span>
+                    <h2 class="text-xl font-black text-white mt-2">Alur Cerita & Rencana Shot</h2>
+                    <p class="text-xs text-slate-400 mt-1">Kemas teknik pilihanmu ke dalam alur cerita pendek (tema bebas, yang penting jelas awal-isi-akhirnya).</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-300 mb-1.5 uppercase">Judul Video</label>
+                        <input type="text" id="input-title" class="w-full bg-slate-900/70 border border-slate-600 rounded-xl px-4 py-3 text-xs text-white placeholder-slate-500 focus:border-amber-500 outline-none" placeholder="Contoh: Secangkir Pagi di Sekolah">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-300 mb-1.5 uppercase">Tema / Genre (Bebas)</label>
+                        <input type="text" id="input-theme" class="w-full bg-slate-900/70 border border-slate-600 rounded-xl px-4 py-3 text-xs text-white placeholder-slate-500 focus:border-amber-500 outline-none" placeholder="Contoh: Cinematic Vlog / Drama / B-Roll">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-300 mb-1.5 uppercase">Sinopsis / Alur Cerita Singkat</label>
+                    <textarea id="input-synopsis" rows="3" class="w-full bg-slate-900/70 border border-slate-600 rounded-xl px-4 py-3 text-xs text-white placeholder-slate-500 focus:border-amber-500 outline-none" placeholder="Ceritakan secara ringkas alur awal, inti cerita, dan penutup video yang akan dibuat..."></textarea>
+                </div>
+
+                <!-- 4 Adegan Penerapan Teknik -->
+                <div class="space-y-3">
+                    <p class="text-[11px] font-bold text-amber-300 uppercase tracking-wide"><i class="fas fa-film mr-1"></i> Rencana Penerapan Teknik per Adegan</p>
+
+                    <!-- Scene 1 -->
+                    <div class="bg-slate-800/60 border border-slate-700 p-3.5 rounded-2xl border-l-4 border-l-sky-500 space-y-2">
+                        <p class="text-xs font-extrabold text-white">Adegan 1: Pembuka (Opening)</p>
+                        <input type="text" id="sc1-tech" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-[11px] text-sky-300 placeholder-slate-500 outline-none" placeholder="Teknik HP dipakai (misal: Reveal Shot + AE/AF Lock)">
+                        <textarea id="sc1-desc" rows="2" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-[11px] text-white placeholder-slate-500 outline-none" placeholder="Deskripsi gambar/aksi pada adegan pembuka..."></textarea>
+                    </div>
+
+                    <!-- Scene 2 -->
+                    <div class="bg-slate-800/60 border border-slate-700 p-3.5 rounded-2xl border-l-4 border-l-emerald-500 space-y-2">
+                        <p class="text-xs font-extrabold text-white">Adegan 2: Pengembangan / Aksi</p>
+                        <input type="text" id="sc2-tech" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-[11px] text-emerald-300 placeholder-slate-500 outline-none" placeholder="Teknik HP dipakai (misal: Ninja Walk + Low Angle)">
+                        <textarea id="sc2-desc" rows="2" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-[11px] text-white placeholder-slate-500 outline-none" placeholder="Deskripsi gambar/aksi pada bagian isi..."></textarea>
+                    </div>
+
+                    <!-- Scene 3 -->
+                    <div class="bg-slate-800/60 border border-slate-700 p-3.5 rounded-2xl border-l-4 border-l-amber-500 space-y-2">
+                        <p class="text-xs font-extrabold text-white">Adegan 3: Klimaks / Highlight Utama</p>
+                        <input type="text" id="sc3-tech" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-[11px] text-amber-300 placeholder-slate-500 outline-none" placeholder="Teknik HP dipakai (misal: Parallax Orbit + Slow Motion 60fps)">
+                        <textarea id="sc3-desc" rows="2" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-[11px] text-white placeholder-slate-500 outline-none" placeholder="Deskripsi gambar/aksi momen paling keren..."></textarea>
+                    </div>
+
+                    <!-- Scene 4 -->
+                    <div class="bg-slate-800/60 border border-slate-700 p-3.5 rounded-2xl border-l-4 border-l-purple-500 space-y-2">
+                        <p class="text-xs font-extrabold text-white">Adegan 4: Penutup (Ending)</p>
+                        <input type="text" id="sc4-tech" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-[11px] text-purple-300 placeholder-slate-500 outline-none" placeholder="Teknik HP dipakai (misal: Pull-out + Silhouette)">
+                        <textarea id="sc4-desc" rows="2" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-[11px] text-white placeholder-slate-500 outline-none" placeholder="Deskripsi gambar penutup cerita..."></textarea>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 pt-2">
+                    <button onclick="goToStep(3, true)" class="px-4 py-3.5 bg-slate-800 border border-slate-600 text-slate-300 font-bold rounded-xl text-xs hover:bg-slate-700 transition">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <button onclick="goToStep(5)" class="flex-1 bg-amber-600 hover:bg-amber-500 text-white font-bold py-3.5 rounded-xl transition shadow-lg active:scale-95 text-sm uppercase tracking-wider flex justify-center items-center gap-2">
+                        Lanjut Produksi & Editing <i class="fas fa-cut"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAHAP 5: EKSEKUSI, EDITING & PENGUMPULAN ==================== -->
+        <section id="step-5" class="hidden flex-col flex-1 page-enter w-full">
+            <div class="glass-panel p-5 md:p-6 rounded-3xl space-y-5">
+                <div class="border-b border-slate-700/80 pb-4">
+                    <span class="bg-emerald-500/20 text-emerald-300 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">Tahap 5 / 5</span>
+                    <h2 class="text-xl font-black text-white mt-2">Produksi, Editing & Kumpul</h2>
+                    <p class="text-xs text-slate-400 mt-1">Setelah selesai syuting & mengedit video sesuai alur, lengkapi bukti pengumpulan di bawah ini.</p>
+                </div>
+
+                <!-- Checklist Produksi & Editing -->
+                <div class="space-y-2">
+                    <label class="block text-[11px] font-bold text-emerald-300 uppercase tracking-wide">Checklist Penyelesaian Proyek</label>
+
+                    <div class="relative">
+                        <input type="checkbox" id="chk1" class="edit-checkbox hidden">
+                        <label for="chk1" class="flex items-center gap-3 p-3 rounded-xl border border-slate-700 bg-slate-800/60 cursor-pointer transition">
+                            <div class="edit-icon w-5 h-5 rounded border border-slate-500 flex items-center justify-center shrink-0 transition"><i class="fas fa-check text-[10px] opacity-0"></i></div>
+                            <span class="text-xs font-semibold text-slate-200">Lensa HP dibersihkan & AE/AF Lock digunakan saat syuting</span>
+                        </label>
+                    </div>
+                    <div class="relative">
+                        <input type="checkbox" id="chk2" class="edit-checkbox hidden">
+                        <label for="chk2" class="flex items-center gap-3 p-3 rounded-xl border border-slate-700 bg-slate-800/60 cursor-pointer transition">
+                            <div class="edit-icon w-5 h-5 rounded border border-slate-500 flex items-center justify-center shrink-0 transition"><i class="fas fa-check text-[10px] opacity-0"></i></div>
+                            <span class="text-xs font-semibold text-slate-200">Semua adegan direkam sesuai alur cerita & teknik pilihan</span>
+                        </label>
+                    </div>
+                    <div class="relative">
+                        <input type="checkbox" id="chk3" class="edit-checkbox hidden">
+                        <label for="chk3" class="flex items-center gap-3 p-3 rounded-xl border border-slate-700 bg-slate-800/60 cursor-pointer transition">
+                            <div class="edit-icon w-5 h-5 rounded border border-slate-500 flex items-center justify-center shrink-0 transition"><i class="fas fa-check text-[10px] opacity-0"></i></div>
+                            <span class="text-xs font-semibold text-slate-200">Video telah diedit (Cut, Color Grading, BGM & SFX)</span>
+                        </label>
+                    </div>
+                    <div class="relative">
+                        <input type="checkbox" id="chk4" class="edit-checkbox hidden">
+                        <label for="chk4" class="flex items-center gap-3 p-3 rounded-xl border border-slate-700 bg-slate-800/60 cursor-pointer transition">
+                            <div class="edit-icon w-5 h-5 rounded border border-slate-500 flex items-center justify-center shrink-0 transition"><i class="fas fa-check text-[10px] opacity-0"></i></div>
+                            <span class="text-xs font-semibold text-slate-200">Video di-export dalam kualitas tinggi (1080p/4K)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Aplikasi Editing & Link Pengumpulan -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-300 mb-1.5 uppercase">Aplikasi Editing</label>
+                        <input type="text" id="input-editor-app" class="w-full bg-slate-900/70 border border-slate-600 rounded-xl px-4 py-3 text-xs text-white placeholder-slate-500 focus:border-emerald-500 outline-none" placeholder="Contoh: CapCut / VN / Premiere Pro">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-300 mb-1.5 uppercase">Durasi Akhir Video</label>
+                        <input type="text" id="input-duration" class="w-full bg-slate-900/70 border border-slate-600 rounded-xl px-4 py-3 text-xs text-white placeholder-slate-500 focus:border-emerald-500 outline-none" placeholder="Contoh: 1 Menit 15 Detik">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-300 mb-1.5 uppercase">Link / Metode Pengumpulan Video Akhir</label>
+                    <input type="text" id="input-video-link" class="w-full bg-slate-900/70 border border-slate-600 rounded-xl px-4 py-3 text-xs text-white placeholder-slate-500 focus:border-emerald-500 outline-none" placeholder="Paste link GDrive/YouTube/Reels atau ketik: Dikumpulkan ke PC Lab">
+                </div>
+
+                <!-- Upload Foto Bukti BTS / Timeline -->
+                <div class="bg-slate-900/80 border border-slate-700 p-4 rounded-2xl">
+                    <label class="block text-[11px] font-bold text-amber-300 mb-1 uppercase"><i class="fas fa-camera-retro mr-1"></i> Foto Bukti Syuting (BTS) / Timeline Edit</label>
+                    <p class="text-[10px] text-slate-400 mb-3">Unggah 1 foto saat praktik syuting pakai HP atau screenshot layar aplikasi editing kamu.</p>
+                    <label class="flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 border-dashed py-3 rounded-xl cursor-pointer transition">
+                        <i class="fas fa-cloud-upload-alt text-emerald-400"></i>
+                        <span class="text-xs font-bold text-white" id="label-bts">Ketuk untuk Unggah Foto Bukti</span>
+                        <input type="file" accept="image/*" class="hidden" onchange="handleImageUpload(event, 'preview-bts', 'data-bts', 'label-bts')">
+                    </label>
+                    <input type="hidden" id="data-bts">
+                    <div id="preview-bts-box" class="mt-3 hidden">
+                        <img id="preview-bts" class="w-full h-36 object-cover rounded-xl border border-slate-600">
+                    </div>
+                </div>
+
+                <div class="flex gap-3 pt-2">
+                    <button onclick="goToStep(4, true)" class="px-4 py-3.5 bg-slate-800 border border-slate-600 text-slate-300 font-bold rounded-xl text-xs hover:bg-slate-700 transition">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <button onclick="finishProject()" class="flex-1 bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-bold py-3.5 rounded-xl transition shadow-lg shadow-emerald-600/25 active:scale-95 text-sm uppercase tracking-wider flex justify-center items-center gap-2">
+                        Selesai & Buat Laporan PDF <i class="fas fa-file-pdf"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAHAP 6: HASIL LKPD (PDF READY) ==================== -->
+        <section id="step-6" class="hidden page-enter w-full pb-10">
+            <div id="pdf-content" class="shadow-2xl border border-slate-200 bg-white overflow-hidden">
+
+                <!-- KOP SURAT -->
+                <div class="bg-slate-900 p-5 flex items-center justify-between border-b-4 border-sky-500">
+                    <img id="res-logo1" src="" class="w-14 h-14 bg-white rounded-full object-contain p-1 shrink-0 hidden border-2 border-slate-300">
+                    <div class="text-center px-3 flex-1">
+                        <h1 class="text-base md:text-lg font-black uppercase tracking-widest text-white leading-none">SMKN 1 Tasikmalaya</h1>
+                        <h2 class="text-[10px] md:text-xs font-bold text-sky-400 mt-1 uppercase tracking-widest">Program Keahlian Broadcasting & Film</h2>
+                        <p class="text-[9px] text-slate-400 mt-0.5">Tahun Pelajaran 2026/2027</p>
+                    </div>
+                    <img id="res-logo2" src="" class="w-14 h-14 bg-black rounded-full object-cover shrink-0 hidden border-2 border-slate-600">
+                </div>
+
+                <div class="bg-slate-100 text-center py-2.5 border-b border-slate-200">
+                    <h3 class="text-xs md:text-sm font-black text-slate-800 uppercase tracking-wider">Laporan Kerja Proyek (LKPD)</h3>
+                    <p class="text-[10px] font-bold text-sky-700 uppercase tracking-widest mt-0.5">Optimalisasi Pengambilan Gambar Video Handphone</p>
+                </div>
+
+                <div class="p-5 md:p-6 space-y-5">
+                    <!-- IDENTITAS -->
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 flex items-center gap-4">
+                        <img id="res-photo" src="" class="w-16 h-16 object-cover rounded-full border-2 border-white shadow shrink-0 hidden">
+                        <div class="flex-1">
+                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Nama Siswa / Kelompok</p>
+                            <h4 class="text-base font-black text-slate-900 leading-tight" id="res-name">-</h4>
+                            <div class="flex flex-wrap gap-1.5 mt-1.5">
+                                <span class="text-[10px] font-bold text-sky-700 bg-sky-100 px-2 py-0.5 rounded border border-sky-200" id="res-class">-</span>
+                                <span class="text-[10px] font-bold text-slate-700 bg-slate-200 px-2 py-0.5 rounded" id="res-device">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- A. RISET & TEKNIK -->
+                    <div>
+                        <h4 class="text-[11px] font-black text-slate-900 border-b-2 border-slate-800 pb-1 mb-2.5 uppercase tracking-wider">A. Riset Referensi & Teknik Pilihan</h4>
+                        <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-2 text-[10px]">
+                            <div>
+                                <span class="font-bold text-red-600">Referensi YouTube:</span>
+                                <p class="break-all text-slate-700 italic" id="res-yt-1">-</p>
+                                <p class="break-all text-slate-500 italic hidden" id="res-yt-2"></p>
+                            </div>
+                            <div class="pt-1 border-t border-slate-200">
+                                <span class="font-bold text-slate-800 block mb-1">Teknik yang Diterapkan:</span>
+                                <div id="res-tech-badges" class="flex flex-wrap gap-1"></div>
+                            </div>
+                            <div class="pt-1 border-t border-slate-200">
+                                <span class="font-bold text-slate-800 block mb-0.5">Catatan Analisa:</span>
+                                <p class="text-slate-700 whitespace-pre-line leading-relaxed" id="res-tech-notes">-</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- B. ALUR CERITA & SHOTLIST -->
+                    <div>
+                        <h4 class="text-[11px] font-black text-slate-900 border-b-2 border-slate-800 pb-1 mb-2.5 uppercase tracking-wider">B. Konsep Alur Cerita & Penerapan Shot</h4>
+                        <div class="bg-amber-50/70 border border-amber-200 rounded-lg p-3 mb-2.5 text-[10px]">
+                            <p class="font-black text-slate-900 text-xs" id="res-title">-</p>
+                            <p class="font-bold text-amber-700 mb-1" id="res-theme">-</p>
+                            <p class="text-slate-700 leading-relaxed" id="res-synopsis">-</p>
+                        </div>
+                        <div id="res-scenes" class="space-y-2">
+                            <!-- Injected via JS -->
+                        </div>
+                    </div>
+
+                    <!-- C. EDITING & BUKTI -->
+                    <div>
+                        <h4 class="text-[11px] font-black text-slate-900 border-b-2 border-slate-800 pb-1 mb-2.5 uppercase tracking-wider">C. Hasil Editing & Bukti Produksi</h4>
+                        <div class="grid grid-cols-2 gap-2 mb-2.5 text-[10px]">
+                            <div class="bg-slate-50 border border-slate-200 p-2.5 rounded-lg">
+                                <p class="text-[9px] font-bold text-slate-400 uppercase">Aplikasi Editing</p>
+                                <p class="font-bold text-slate-800 mt-0.5" id="res-editor-app">-</p>
+                            </div>
+                            <div class="bg-slate-50 border border-slate-200 p-2.5 rounded-lg">
+                                <p class="text-[9px] font-bold text-slate-400 uppercase">Durasi Akhir</p>
+                                <p class="font-bold text-slate-800 mt-0.5" id="res-duration">-</p>
+                            </div>
+                        </div>
+                        <div class="bg-emerald-50 border border-emerald-200 p-2.5 rounded-lg text-[10px] mb-3">
+                            <p class="text-[9px] font-bold text-emerald-700 uppercase">Link / Lokasi Pengumpulan Video</p>
+                            <p class="font-bold text-slate-800 break-all mt-0.5" id="res-video-link">-</p>
+                        </div>
+                        <div class="w-full h-44 bg-slate-100 rounded-lg border border-slate-300 flex items-center justify-center overflow-hidden">
+                            <img id="res-bts" src="" class="w-full h-full object-contain hidden">
+                        </div>
+                    </div>
+
+                    <!-- PENGESAHAN -->
+                    <div class="mt-8 pt-4 flex justify-between items-end">
+                        <div class="text-center w-36">
+                            <p class="text-[9px] text-slate-500 mb-12">Mengetahui, Guru Mapel</p>
+                            <div class="border-b border-slate-800 pb-1"></div>
+                        </div>
+                        <div class="text-center w-36">
+                            <p class="text-[9px] text-slate-500 mb-12">Siswa / Ketua Kelompok,</p>
+                            <div class="border-b border-slate-800 pb-1">
+                                <p class="text-[10px] font-bold text-slate-800 truncate" id="res-ttd">-</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="text-[8px] text-slate-400 text-center pt-3 border-t border-slate-100">
+                        Dicetak melalui Aplikasi Mobile Cinema Lab pada <span id="res-date" class="font-semibold"></span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- TOMBOL AKSI PDF -->
+            <div class="mt-5 flex flex-col md:flex-row gap-3 no-print w-full">
+                <button onclick="exportToPDF()" id="btn-export" class="flex-[2] py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-lg transition text-sm flex items-center justify-center gap-2 active:scale-95">
+                    <i class="fas fa-share-alt"></i> Bagikan / Simpan PDF
+                </button>
+                <button onclick="location.reload()" class="flex-1 py-4 bg-slate-200 text-slate-800 font-bold rounded-xl text-sm transition active:scale-95">
+                    Buat Baru
+                </button>
+            </div>
+
+            <!-- FALLBACK CETAK SISTEM (ANTI BLOKIR HTML VIEWER) -->
+            <div id="download-warning" class="hidden mt-3 p-4 bg-red-50 border border-red-200 rounded-xl text-center no-print shadow-sm">
+                <p class="text-xs text-red-600 font-bold mb-1 flex items-center justify-center gap-1">
+                    <i class="fas fa-exclamation-triangle"></i> Menu Berbagi / Unduh Terblokir?
+                </p>
+                <p class="text-[10px] text-slate-600 mb-3 leading-relaxed">
+                    Jika file tidak masuk ke folder Unduhan, tekan tombol di bawah lalu ubah pilihan Printer menjadi <strong class="text-slate-900">"Simpan sebagai PDF / Save as PDF"</strong>.
+                </p>
+                <button onclick="window.print()" class="w-full py-3 bg-slate-900 text-white font-bold rounded-xl text-xs shadow-lg active:scale-95 transition flex items-center justify-center gap-2">
+                    <i class="fas fa-print"></i> Gunakan Cetak Sistem (Simpan PDF)
+                </button>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed top-5 left-1/2 transform -translate-x-1/2 -translate-y-[150%] bg-slate-900 border border-slate-700 text-white px-5 py-3 rounded-full shadow-2xl transition-all duration-300 z-[100] flex items-center gap-3 w-max max-w-[90vw] opacity-0 pointer-events-none">
+        <i id="toast-icon" class="fas fa-info-circle text-sky-400"></i>
+        <p class="text-xs font-bold whitespace-normal" id="toast-msg">Pesan</p>
+    </div>
+
+    <script>
+        // --- DAFTAR TEKNIK MOBILE CINEMATOGRAPHY ---
+        const techniquesList = [
+            "AE/AF Lock (Kunci Cahaya)",
+            "Ninja Walk (Stabilisasi)",
+            "Reveal Shot (Dari Balik Objek)",
+            "Parallax / Orbit Shot",
+            "Foreground Framing",
+            "Low Angle (HP Terbalik)",
+            "Push-in / Pull-out Halus",
+            "Slow Motion (60fps)",
+            "Whip Pan / Speed Ramp",
+            "Natural Light / Golden Hour"
+        ];
+
+        // --- STATE DATA ---
+        const state = {
+            name: "", className: "", device: "",
+            logo1: "", logo2: "", photo: "", bts: "",
+            yt1: "", yt2: "", selectedTechs: [], techNotes: "",
+            title: "", theme: "", synopsis: "",
+            scenes: [],
+            editorApp: "", duration: "", videoLink: ""
+        };
+
+        // --- INISIALISASI CHECKLIST TEKNIK ---
+        function renderTechniques() {
+            const grid = document.getElementById('tech-grid');
+            grid.innerHTML = "";
+            techniquesList.forEach((tech, idx) => {
+                grid.innerHTML += `
+                    <div class="relative">
+                        <input type="checkbox" id="tech-${idx}" value="${tech}" class="tech-checkbox hidden">
+                        <label for="tech-${idx}" class="flex items-center gap-2 p-2.5 rounded-xl border border-slate-700 bg-slate-800/70 text-[11px] font-semibold text-slate-300 cursor-pointer transition h-full">
+                            <span class="check-badge w-4 h-4 rounded border border-slate-500 flex items-center justify-center shrink-0 transition">
+                                <i class="fas fa-check text-[9px] opacity-0 transition"></i>
+                            </span>
+                            <span class="leading-tight">${tech}</span>
+                        </label>
+                    </div>
+                `;
+            });
+        }
+        renderTechniques();
+
+        // --- TOAST ---
+        function showToast(msg, type = 'info') {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toast-icon');
+            document.getElementById('toast-msg').innerText = msg;
+
+            if (type === 'error') {
+                icon.className = "fas fa-exclamation-circle text-red-500";
+            } else {
+                icon.className = "fas fa-check-circle text-emerald-400";
+            }
+
+            toast.classList.remove('-translate-y-[150%]', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('-translate-y-[150%]', 'opacity-0');
+            }, 3000);
+        }
+
+        // --- UPLOAD GAMBAR BASE64 ---
+        function handleImageUpload(event, previewId, dataId, labelId) {
+            const file = event.target.files[0];
+            if (!file) return;
+            if (file.size > 2.5 * 1024 * 1024) {
+                showToast("Maksimal ukuran gambar 2.5MB!", "error");
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                document.getElementById(dataId).value = e.target.result;
+                const img = document.getElementById(previewId);
+                img.src = e.target.result;
+                img.classList.remove('hidden');
+
+                if (previewId === 'preview-bts') {
+                    document.getElementById('preview-bts-box').classList.remove('hidden');
+                }
+
+                const lbl = document.getElementById(labelId);
+                lbl.innerText = "Tersimpan";
+                lbl.classList.add('text-emerald-400');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // --- UPDATE PROGRESS DOT ---
+        function updateDots(stepNum) {
+            for (let i = 1; i <= 5; i++) {
+                const dot = document.getElementById(`dot-${i}`);
+                if (i === stepNum) {
+                    dot.className = "h-1.5 w-8 rounded-full bg-sky-400 transition-all";
+                } else if (i < stepNum) {
+                    dot.className = "h-1.5 w-4 rounded-full bg-emerald-500 transition-all";
+                } else {
+                    dot.className = "h-1.5 w-4 rounded-full bg-slate-700 transition-all";
+                }
+            }
+        }
+
+        // --- NAVIGASI ANTAR TAHAP ---
+        function goToStep(targetStep, isBack = false) {
+            if (!isBack) {
+                // Validasi Tahap 1 -> 2
+                if (targetStep === 2) {
+                    state.name = document.getElementById('input-name').value.trim();
+                    state.className = document.getElementById('input-class').value;
+                    state.device = document.getElementById('input-device').value.trim();
+                    state.logo1 = document.getElementById('data-logo1').value;
+                    state.logo2 = document.getElementById('data-logo2').value;
+                    state.photo = document.getElementById('data-photo').value;
+
+                    if (!state.name || !state.className || !state.device || !state.photo) {
+                        return showToast("Lengkapi Nama, Kelas, Tipe HP, dan Foto Profil!", "error");
+                    }
+                }
+                // Validasi Tahap 3 -> 4
+                if (targetStep === 4) {
+                    state.yt1 = document.getElementById('input-yt-1').value.trim();
+                    state.yt2 = document.getElementById('input-yt-2').value.trim();
+                    state.techNotes = document.getElementById('input-tech-notes').value.trim();
+                    const checkedTechs = Array.from(document.querySelectorAll('.tech-checkbox:checked')).map(cb => cb.value);
+                    state.selectedTechs = checkedTechs;
+
+                    if (!state.yt1) return showToast("Wajib melampirkan minimal 1 Link Video YouTube!", "error");
+                    if (checkedTechs.length < 3) return showToast("Pilih minimal 3 teknik yang akan diterapkan!", "error");
+                    if (!state.techNotes) return showToast("Tuliskan catatan hasil analisa teknikmu!", "error");
+                }
+                // Validasi Tahap 4 -> 5
+                if (targetStep === 5) {
+                    state.title = document.getElementById('input-title').value.trim();
+                    state.theme = document.getElementById('input-theme').value.trim();
+                    state.synopsis = document.getElementById('input-synopsis').value.trim();
+
+                    if (!state.title || !state.theme || !state.synopsis) {
+                        return showToast("Lengkapi Judul, Tema, dan Sinopsis Alur Cerita!", "error");
+                    }
+
+                    const sceneLabels = ["Pembuka (Opening)", "Pengembangan / Aksi", "Klimaks / Highlight", "Penutup (Ending)"];
+                    state.scenes = [];
+                    for (let i = 1; i <= 4; i++) {
+                        const tech = document.getElementById(`sc${i}-tech`).value.trim();
+                        const desc = document.getElementById(`sc${i}-desc`).value.trim();
+                        if (!tech || !desc) {
+                            return showToast(`Lengkapi teknik & deskripsi pada Adegan ${i}!`, "error");
+                        }
+                        state.scenes.push({ num: i, label: sceneLabels[i - 1], tech, desc });
+                    }
+                }
+            }
+
+            // Sembunyikan semua section 1-5
+            for (let i = 1; i <= 5; i++) {
+                const sec = document.getElementById(`step-${i}`);
+                sec.classList.add('hidden');
+                sec.classList.remove('flex');
+            }
+
+            // Tampilkan target section
+            const targetEl = document.getElementById(`step-${targetStep}`);
+            targetEl.classList.remove('hidden');
+            if (targetStep > 1) targetEl.classList.add('flex');
+
+            updateDots(targetStep);
+            window.scrollTo(0, 0);
+        }
+
+        // --- SELESAI & GENERATE LAPORAN ---
+        function finishProject() {
+            const checkedCount = document.querySelectorAll('.edit-checkbox:checked').length;
+            state.editorApp = document.getElementById('input-editor-app').value.trim();
+            state.duration = document.getElementById('input-duration').value.trim();
+            state.videoLink = document.getElementById('input-video-link').value.trim();
+            state.bts = document.getElementById('data-bts').value;
+
+            if (checkedCount < 4) return showToast("Centang semua checklist penyelesaian proyek!", "error");
+            if (!state.editorApp || !state.duration || !state.videoLink) {
+                return showToast("Lengkapi info Aplikasi Editing, Durasi, & Link Video!", "error");
+            }
+            if (!state.bts) return showToast("Unggah 1 Foto Bukti Syuting (BTS) atau Timeline Edit!", "error");
+
+            // Populate PDF
+            document.getElementById('res-name').innerText = state.name;
+            document.getElementById('res-ttd').innerText = state.name;
+            document.getElementById('res-class').innerText = state.className;
+            document.getElementById('res-device').innerText = "HP: " + state.device;
+
+            if (state.logo1) {
+                document.getElementById('res-logo1').src = state.logo1;
+                document.getElementById('res-logo1').classList.remove('hidden');
+            }
+            if (state.logo2) {
+                document.getElementById('res-logo2').src = state.logo2;
+                document.getElementById('res-logo2').classList.remove('hidden');
+            }
+            if (state.photo) {
+                document.getElementById('res-photo').src = state.photo;
+                document.getElementById('res-photo').classList.remove('hidden');
+            }
+
+            // Riset & Teknik
+            document.getElementById('res-yt-1').innerText = "1. " + state.yt1;
+            if (state.yt2) {
+                const yt2El = document.getElementById('res-yt-2');
+                yt2El.innerText = "2. " + state.yt2;
+                yt2El.classList.remove('hidden');
+            }
+
+            const badgeContainer = document.getElementById('res-tech-badges');
+            badgeContainer.innerHTML = state.selectedTechs.map(t =>
+                `<span class="bg-sky-100 text-sky-800 border border-sky-200 px-2 py-0.5 rounded font-bold text-[9px]">✓ ${t}</span>`
+            ).join('');
+            document.getElementById('res-tech-notes').innerText = state.techNotes;
+
+            // Alur Cerita & Adegan
+            document.getElementById('res-title').innerText = `"${state.title}"`;
+            document.getElementById('res-theme').innerText = "Tema: " + state.theme;
+            document.getElementById('res-synopsis').innerText = state.synopsis;
+
+            const scenesContainer = document.getElementById('res-scenes');
+            scenesContainer.innerHTML = state.scenes.map(sc => `
+                <div class="bg-slate-50 border border-slate-200 rounded-lg p-2.5 flex gap-3 items-start">
+                    <div class="w-7 h-7 rounded bg-slate-800 text-white font-black text-xs flex items-center justify-center shrink-0">0${sc.num}</div>
+                    <div class="flex-1 text-[10px]">
+                        <div class="flex flex-wrap justify-between gap-1 mb-0.5">
+                            <span class="font-extrabold text-slate-900">${sc.label}</span>
+                            <span class="font-bold text-sky-700 bg-sky-50 px-1.5 py-0.2 rounded border border-sky-200">${sc.tech}</span>
+                        </div>
+                        <p class="text-slate-700 leading-snug">${sc.desc}</p>
+                    </div>
+                </div>
+            `).join('');
+
+            // Editing & Bukti
+            document.getElementById('res-editor-app').innerText = state.editorApp;
+            document.getElementById('res-duration').innerText = state.duration;
+            document.getElementById('res-video-link').innerText = state.videoLink;
+            document.getElementById('res-bts').src = state.bts;
+            document.getElementById('res-bts').classList.remove('hidden');
+
+            const now = new Date();
+            document.getElementById('res-date').innerText = now.toLocaleDateString('id-ID', {
+                day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
+            });
+
+            // Tampilkan halaman hasil
+            document.getElementById('main-header').classList.add('hidden');
+            document.getElementById('step-5').classList.add('hidden');
+            document.getElementById('step-5').classList.remove('flex');
+            document.body.style.background = "#f8fafc";
+            document.getElementById('step-6').classList.remove('hidden');
+            window.scrollTo(0, 0);
+            showToast("Laporan LKPD siap dibagikan / dicetak!");
+        }
+
+        // --- EXPORT PDF (WEB SHARE API + FALLBACK CETAK SISTEM) ---
+        function exportToPDF() {
+            showToast("Sedang memproses PDF...");
+            window.scrollTo(0, 0);
+
+            const btn = document.getElementById('btn-export');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Memproses...`;
+            btn.disabled = true;
+
+            const element = document.getElementById('pdf-content');
+            const cleanName = state.name.replace(/[^a-zA-Z0-9]/g, '').substring(0, 15);
+            const cleanClass = state.className.replace(/\s+/g, '');
+            const fileName = `LKPD_MobileCinema_${cleanClass}_${cleanName}.pdf`;
+
+            const opt = {
+                margin: 0.2,
+                filename: fileName,
+                image: { type: 'jpeg', quality: 0.96 },
+                html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).outputPdf('blob').then(function(pdfBlob) {
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+
+                const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
+
+                if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+                    navigator.share({
+                        files: [pdfFile],
+                        title: 'LKPD Mobile Cinema Lab',
+                        text: `Laporan Proyek Mobile Cinematography - ${state.name} (${state.className})`
+                    }).then(() => {
+                        showToast("Menu Berbagi berhasil dibuka!");
+                    }).catch(() => {
+                        document.getElementById('download-warning').classList.remove('hidden');
+                        window.scrollTo(0, document.body.scrollHeight);
+                    });
+                } else {
+                    try {
+                        const blobUrl = URL.createObjectURL(pdfBlob);
+                        const link = document.createElement('a');
+                        link.href = blobUrl;
+                        link.download = fileName;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
+                    } catch (err) {
+                        console.error(err);
+                    }
+                    document.getElementById('download-warning').classList.remove('hidden');
+                    window.scrollTo(0, document.body.scrollHeight);
+                }
+            }).catch(err => {
+                console.error(err);
+                showToast("Gagal memproses PDF.", "error");
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+                document.getElementById('download-warning').classList.remove('hidden');
+            });
+        }
+    </script>
+</body>
+</html>
